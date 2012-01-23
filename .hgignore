@@ -1,0 +1,7 @@
+syntax: glob
+build
+buildJava
+
+syntax: regexp
+
+^zkwebui/WEB-INF/classes$
