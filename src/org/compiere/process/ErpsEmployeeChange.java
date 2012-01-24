@@ -23,6 +23,7 @@ public class ErpsEmployeeChange extends SvrProcess {
 	private String	p_erp_OrderNum;
 	private Timestamp	p_erp_DateFrom;
 	private String  p_contrDesc;
+	private boolean processFlag = true;	 
 	private String finalMsg;
 	private ErpsEncoder encoder = new ErpsEncoder();
 	
@@ -84,6 +85,9 @@ public class ErpsEmployeeChange extends SvrProcess {
 					pstmt.execute();
 					log.log(Level.SEVERE, p_erp_OrderType);
 					finalMsg = encoder.encodeUTF8("Бизнес партнер № " + new Integer(p_erp_C_BPartner_ID).toString() + " изменён...");
+				}else{
+					finalMsg = encoder.encodeUTF8("Данные не изменены...");
+					processFlag = false;
 				}		
 			} else if (p_erp_OrderType != null && p_erp_OrderType.equals("4")) {
 				if (p_erp_C_BPartner_ID != 0) {
@@ -120,7 +124,8 @@ public class ErpsEmployeeChange extends SvrProcess {
 			} else {
 				finalMsg = encoder.encodeUTF8("Никаких действий не произошло...");
 			}
-			setProcessed(true);
+			if(processFlag)
+				setProcessed(true);
 		} catch (Exception e) {
 			log.log(Level.SEVERE, sql_main_rec, e);
 			finalMsg = encoder.encodeUTF8("Ошибка - " + e.getMessage());
@@ -139,6 +144,7 @@ public class ErpsEmployeeChange extends SvrProcess {
 		} else {
 			strProcessed = new String("N");
 		}
+		
 		String sqlForUpdOrder = "UPDATE erps_order "
 				+ "set processed ='" + strProcessed + "'"
 				+ " WHERE erps_order_id=" + p_erp_C_Order_ID;
