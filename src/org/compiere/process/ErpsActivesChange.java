@@ -1,4 +1,4 @@
-package org.compiere.process;
+﻿package org.compiere.process;
 
 public class ErpsActivesChange extends SvrProcess {
 

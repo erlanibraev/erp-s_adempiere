@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  * Copyright (C) 2009 Low Heng Sin                                            *
  * Copyright (C) 2009 Idalica Corporation                                     *
  * This program is free software; you can redistribute it and/or modify it    *

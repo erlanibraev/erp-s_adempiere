@@ -1,4 +1,4 @@
-package org.compiere.process;
+﻿package org.compiere.process;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

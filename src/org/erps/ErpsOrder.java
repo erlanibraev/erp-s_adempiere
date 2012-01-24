@@ -1,4 +1,4 @@
-package org.erps;
+п»їpackage org.erps;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,8 +17,8 @@ import org.compiere.util.Env;
 public class ErpsOrder extends CalloutEngine {
 	
 	private ErpsEncoder encoder = new ErpsEncoder();	
-	private static final int orderTypeHiring = 9; 		// о приеме на работу
-	private static final int orderTypeTransfer = 3; 	// о переводе
+	private static final int orderTypeHiring = 9; 		// Рѕ РїСЂРёРµРјРµ РЅР° СЂР°Р±РѕС‚Сѓ
+	private static final int orderTypeTransfer = 3; 	// Рѕ РїРµСЂРµРІРѕРґРµ
 	private String msg = "";
 	
 	public String bpartner(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value) throws SQLException, EncoderException{
