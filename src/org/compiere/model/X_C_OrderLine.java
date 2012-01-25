@@ -921,10 +921,10 @@ public class X_C_OrderLine extends PO implements I_C_OrderLine, I_Persistent
 		@param PriceEntered 
 		Price Entered - the price based on the selected/base UoM
 	  */
-	public void setPriceEntered (BigDecimal PriceEntered)
+	/*public void setPriceEntered (BigDecimal PriceEntered)
 	{
 		set_Value (COLUMNNAME_PriceEntered, PriceEntered);
-	}
+	}*/
 
 	/** Get Price.
 		@return Price Entered - the price based on the selected/base UoM
@@ -1264,4 +1264,61 @@ public class X_C_OrderLine extends PO implements I_C_OrderLine, I_Persistent
 			 return 0;
 		return ii.intValue();
 	}
+	
+	/**
+	 * TODO: Moved from the model
+	 * 	Set Defaults from Order.
+	 * 	Does not set Parent !!
+	 * 	@param order order
+	 */
+	public void setOrder (MOrder order)
+	{
+		
+		setClientOrg(order);
+		setC_BPartner_ID(order.getC_BPartner_ID());
+		setC_BPartner_Location_ID(order.getC_BPartner_Location_ID());
+		setM_Warehouse_ID(order.getM_Warehouse_ID());
+		setDateOrdered(order.getDateOrdered());
+		setDatePromised(order.getDatePromised());
+		setC_Currency_ID(order.getC_Currency_ID());
+		setC_Project_ID(order.getC_Project_ID());
+		setC_ProjectPhase_ID(order.getC_ProjectPhase_ID());	
+		setC_Charge_ID(1000025);
+		//
+		setHeaderInfo(order);	//	sets m_order
+		//	Don't set Activity, etc as they are overwrites
+	}	//	setOrder
+	
+	private int 			m_M_PriceList_ID = 0;
+	//
+	private boolean			m_IsSOTrx = true;
+	/** Parent					*/
+	private MOrder			m_parent = null;
+	/** Cached Currency Precision	*/
+	private Integer			m_precision = null;
+	
+	/**
+	 * TODO: Moved from the model
+	 * 	Set Header Info
+	 *	@param order order
+	 */
+	public void setHeaderInfo (MOrder order)
+	{
+		m_parent = order;
+		m_precision = new Integer(order.getPrecision());
+		m_M_PriceList_ID = order.getM_PriceList_ID();
+		m_IsSOTrx = order.isSOTrx();
+	}	//	setHeaderInfo
+	
+	/*
+	 * TODO: Moved from the model
+	 * @see org.compiere.model.I_C_OrderLine#setPriceEntered(java.math.BigDecimal)
+	 */
+	public void setPriceEntered (BigDecimal PriceActual)
+	{
+		if (PriceActual == null) 
+			throw new IllegalArgumentException ("PriceActual is mandatory");
+		set_ValueNoCheck("PriceEntered", PriceActual);
+	}	//	setPriceActual
+
 }
