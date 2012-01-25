@@ -1,4 +1,4 @@
-﻿package org.adempiere.process.rpl.imp;
+package org.adempiere.process.rpl.imp;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
