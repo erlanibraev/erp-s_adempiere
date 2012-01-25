@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Date;
 import javax.xml.xpath.XPathExpressionException;
+
 import org.compiere.model.MBankAccount;
 import org.compiere.model.MBankStatement;
 import org.compiere.model.MBankStatementLine;
@@ -15,6 +16,9 @@ import org.compiere.model.MCash;
 import org.compiere.model.MCashLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
+import org.compiere.model.MJournal;
+import org.compiere.model.MJournalBatch;
+import org.compiere.model.MJournalLine;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.MPayment;
@@ -49,6 +53,7 @@ public class Import1C {
 	public static String cBPAcc = "ContractorAccount"; // Settlement Account
 	public static String cBisPart = "BusinessPartner"; // Contractor
 	public static String cINN = "INN"; // INN (RNN)
+	public static String cRNN = "RNN"; // RNN
 	public static String cCode = "Code"; // Code
 	public static String cPayAmt = "PaymentSum"; // Payment Amount
 	public static String cNum = "Number"; // Number
@@ -78,8 +83,12 @@ public class Import1C {
 	private Map<String, List<String>> VAT  = new HashMap<String, List<String>>();
 	private Map<String, List<String>> Product  = new HashMap<String, List<String>>();
 	private Map<String, List<String>> PurOrder  = new HashMap<String, List<String>>();
+	private Map<String, List<String>> Advance  = new HashMap<String, List<String>>();
+	private Map<String, List<String>> Closing  = new HashMap<String, List<String>>();
+	private Map<String, List<String>> Operation  = new HashMap<String, List<String>>();
 	private String sRes1 = new String(); 
 	private String sRes2 = new String(); 
+	private Properties pJournalBatch = new Properties();
 
 	/** Set change PO			*/
 	boolean isChanged= false;
@@ -201,15 +210,18 @@ public class Import1C {
 	private void findBP() throws SQLException
 	{ 
 		Properties AttrVal = lAttrVal.get(0);
-		if (AttrVal.getProperty(cINN)==null 
-			|| AttrVal.getProperty(cCode)==null) return;
+		if (AttrVal.getProperty(cCode)==null) return;
+		String sRNN = null;
+		if (AttrVal.getProperty(cINN)!=null) sRNN = AttrVal.getProperty(cINN);
+		if (AttrVal.getProperty(cRNN)!=null) sRNN = AttrVal.getProperty(cRNN);
+		if (sRNN==null) return;
 // Finding Business Partner ID		
 		String sql = "SELECT c_bpartner_id FROM c_bpartner"
   			+ " WHERE ad_client_id = " + AD_Client_ID
 //  			+ " AND ad_org_id = " + AD_Org_ID
   			+ " AND isactive='Y' "  			
   			+ " AND value = '" + AttrVal.getProperty(cCode) 
-  			+ " "+ AttrVal.getProperty(cINN)+"'";
+  			+ " "+ sRNN+"'";
 		if (SingleSQLSelect(sql)) {  
 			List<String> sval = new ArrayList<String>();
 			sval.add(sRes1);
@@ -221,8 +233,8 @@ public class Import1C {
 		  			+ " WHERE ad_client_id = " + AD_Client_ID
 //		  			+ " AND ad_org_id = " + AD_Org_ID
 		  			+ " AND isactive='Y' "  			
-		  			+ " AND value = '"
-		  			+  AttrVal.getProperty(cINN)+"'";
+		  			+ " AND value like '%"
+		  			+  sRNN+"%'";
 			if (SingleSQLSelect(sql)) {  
 				List<String> sval = new ArrayList<String>();
 			   	sval.add(sRes1);
@@ -232,8 +244,9 @@ public class Import1C {
 			} else	
 				System.out.println("Not found Business Partner: "
 					+AttrVal.getProperty(cCode)
-					+ " "+ AttrVal.getProperty(cINN)
-					+ " "+ AttrVal.getProperty("FullName"));
+					+ " "+ sRNN
+					+ " "+ AttrVal.getProperty("FullName")
+					+ " "+ AttrVal.getProperty("Name"));
 		}
 	}   
 
@@ -421,6 +434,78 @@ public class Import1C {
 		Account.put(AttrVal.getProperty(cID), sval);
 	}   
 	
+	private void addAdvance()
+	{ 
+		Properties AttrVal = lAttrVal.get(0);
+		List<String> sval = new ArrayList<String>();
+		if (AttrVal.getProperty(cID)==null) return; 
+		if (AttrVal.getProperty(cDocNum)==null) return; 
+		if (AttrVal.getProperty("Operation")==null) return; 
+		sval.add(AttrVal.getProperty(cID));
+		sval.add(AttrVal.getProperty(cDocNum));
+		Advance.put(AttrVal.getProperty("Operation"), sval);
+	}   
+
+	private void addClosing()
+	{ 
+		Properties AttrVal = lAttrVal.get(0);
+		List<String> sval = new ArrayList<String>();
+		if (AttrVal.getProperty(cID)==null) return; 
+		if (AttrVal.getProperty(cDocNum)==null) return; 
+		if (AttrVal.getProperty("Operation")==null) return; 
+		sval.add(AttrVal.getProperty(cID));
+		sval.add(AttrVal.getProperty(cDocNum));
+		Closing.put(AttrVal.getProperty("Operation"), sval);
+	}   
+
+	private void addOperation()
+	{ 
+		Properties AttrVal = lAttrVal.get(0);
+		List<String> sval = new ArrayList<String>();
+		if (AttrVal.getProperty(cID)==null) return; 
+		if (AttrVal.getProperty(cDocNum)==null) return; 
+		if (AttrVal.getProperty("Operation")==null) return; 
+		sval.add(AttrVal.getProperty(cID));
+		sval.add(AttrVal.getProperty(cDocNum));
+		Operation.put(AttrVal.getProperty("Operation"), sval);
+	}   
+
+	private int findValidCombination(String AccountCode, String BPCode) throws SQLException
+	{ 
+		if ((AccountCode==null) && (BPCode==null)) {
+			Properties AttrVal = lAttrVal.get(0);
+			Log.log(Level.SEVERE, "AccountCode and BPCode is NULL. "+
+				AttrVal.getProperty(cID)+ " "+AttrVal.getProperty(cNum));			
+			return 0;		
+		}
+		String sql ="SELECT c.c_validcombination_id FROM c_elementvalue as e"
+				 +" LEFT JOIN c_validcombination AS c ON account_id = c_elementvalue_id"
+				 +" WHERE e.ad_client_id = 1000000"
+				 +" AND e.isactive = 'Y'"
+				 +" AND e.issummary = 'N'";
+		String sql2 = sql;
+		if ((AccountCode!=null) && (Account.get(AccountCode)!=null)) {
+			sql += " AND e.value like '"+ Account.get(AccountCode).get(2) +"%'";
+			// Account 3351 validcombination 1000146
+			if ("3351".equals(Account.get(AccountCode).get(2))) 
+				 return 1000146;
+		}
+		if ((BPCode!=null ) && (BP.get(BPCode)!=null)) {
+			sql += " AND c.c_bpartner_id = " + BP.get(BPCode).get(0);
+	    }	
+		if (SingleSQLSelect(sql)) return Integer.valueOf(sRes1);
+		else
+		{
+			if ((AccountCode!=null) && (Account.get(AccountCode)!=null)) {
+				sql2 += " AND e.value like '"+ Account.get(AccountCode).get(2) +"%'";
+				sql2 += " AND c.c_bpartner_id is NULL";
+				if (SingleSQLSelect(sql2)) return Integer.valueOf(sRes1);
+			}
+		}
+		
+		return 0;
+	}   
+	
 	public void importXMLDocument(StringBuffer result, Document documentToBeImported, String trxName,
 			Properties p_param) 
 		throws Exception, SQLException,	XPathExpressionException 
@@ -534,6 +619,12 @@ public class Import1C {
 			        	findProduct();
 			        } else if ("Contract".equals(mTags[2])) {
 			        	findPurchaseOrder();
+			        } else if ("AdvanceClosing".equals(mTags[2])) {
+			        	addAdvance();
+			        } else if ("MonthClosing".equals(mTags[2])) {
+			        	addClosing();
+			        } else if ("Operation".equals(mTags[2])) {
+			        	addOperation();
 			        } else if ( "Payment".equals(mTags[2])) {
 			    		List<String> sval = new ArrayList<String>();
 			    		sval.add(AttrVal.getProperty(cDocNum));
@@ -636,7 +727,7 @@ public class Import1C {
 				        	lAttrVal.add(childAttrVal);  
 			        	}
 			        	if ("Y".equals(p_param.getProperty("SalesOrders"))) import1CSalOrd(trxName);
-			        } else if ( "GL".equals(mTags[2])) {
+			        } else if ("DocOperation".equals(mTags[2]) ) {
 			        	Element thisTag2 = (Element)ElemList.item(j);
 			        	NodeList ElemList2 = thisTag2.getChildNodes();
 			        	for (k=0; k < ElemList2.getLength(); k++) {
@@ -653,7 +744,7 @@ public class Import1C {
 					        			         childTag.getAttributes().item(n).getNodeValue().trim());}
 				        	lAttrVal.add(childAttrVal);  
 			        	}
-			        	if ("Y".equals(p_param.getProperty("GL"))) import1CGL(trxName);
+			        	if ("Y".equals(p_param.getProperty("GL"))) import1CGL(trxName, mTags[2]);
 			        }
 			        lAttrVal.clear();
   	      	  	}	
@@ -923,7 +1014,8 @@ public class Import1C {
 					if (SingleSQLSelect(sql)) {
 						line = new MBankStatementLine(ctx, Integer.valueOf(sRes1), sTrxName);
 						if (sRes2!=null) iPaymentID = Integer.valueOf(sRes2);
-					} else line = new MBankStatementLine(statement, lineNo);
+					} else 
+						line = new MBankStatementLine(statement, lineNo);
 			}
 			lineNo += 10;
 			String sBDR =null, sBPCode = null, sPaymentID = null;
@@ -995,8 +1087,7 @@ public class Import1C {
 					int no = 0;				
 					sql = "UPDATE c_payment SET c_charge_id = "+iChargeID
 						+" WHERE c_payment_id = "+iPaymentID;
-					no = DB.executeUpdate (sql, sTrxName);
-					if (no == 0)
+					if (!SingleSQLSelect(sql))
 						System.out.println("Payment ID "+iPaymentID+ " not updated." + no);
 				}	
 				/*MPayment payment = new MPayment (ctx, iPaymentID, sTrxName);
@@ -1008,6 +1099,7 @@ public class Import1C {
 					    +AttrVal.getProperty(cDocNum)
 					    +" "+AttrVal.getProperty(cDocDate)+" "+(i+1)+
 						" " + childAttrVal.getProperty("FinancialPlan") );
+				    line = null;
 					continue;
 			    }
 				line.setC_Charge_ID(iChargeID);
@@ -1017,7 +1109,9 @@ public class Import1C {
 			line.setERPS_stati_BDR_ID(iBDR);
 		    
 		//	Save statement line
+		//System.out.print("Line 1");
 		line.save();
+		//System.out.println("Line 2");
 		line = null;
 		}
 	}	
@@ -1616,101 +1710,246 @@ public class Import1C {
 /************* Import Issued Invoice from 1C **************/ 	
 
 	/************* Import General Ledger from 1C **************/ 	
-	private void import1CGL(String sTrxName) throws ParseException, SQLException
+	private void import1CGL(String sTrxName, String sDocType) throws ParseException, SQLException
 	{
-		int i = 0;
+		if (lAttrVal.size()<2) return;
 		Properties AttrVal = lAttrVal.get(0);
-		Properties childAttrVal = lAttrVal.get(1);
-		if ( AttrVal.getProperty(cDocNum)==null
-		   || AttrVal.getProperty(cID)==null)
+		//Properties childAttrVal = lAttrVal.get(1);
+		if ( AttrVal.getProperty(cID)==null)
 			return;
 		
-		//System.out.println(AttrVal.getProperty(cDocNum)+" "+i);
-		//if (!"ERP-028".equals(AttrVal.getProperty(cDocNum))) return;
-		//	Detect Duplicates
-/*		String sql = "SELECT c_order_id FROM c_order"
-  			+ " WHERE ad_client_id = " + AD_Client_ID
-  			+ " AND isactive='Y'"  			
-  			+ " AND documentno = '" + AttrVal.getProperty(cDocNum) + "'"
-  			+ " AND dateordered = '" + AttrVal.getProperty(cDocDate) + "'";
-		int iOrderID = 0; 
-		if (SingleSQLSelect(sql)) iOrderID = Integer.valueOf(sRes1);
-		
-		int lineNo = 10;
-		//int iChargeID = 0;
-		//int iProductID = 0;
-		//String sBDR = null; 
-		String sBPCode = null;
+//********** batch
+		StringBuffer sDocNum = new StringBuffer("ERP-"
+			+"20"+AttrVal.getProperty(cDocDate).substring(6,8)
+			+AttrVal.getProperty(cDocDate).substring(3,5));
+		int C_DocType_ID = 0;
+		StringBuffer sPriDocNum = new StringBuffer("");
+		sPriDocNum.setLength(0);
+		if ((Advance.get(AttrVal.getProperty(cID))!=null)&&
+			   (Advance.get(AttrVal.getProperty(cID)).get(1)!=null)) {
+			sPriDocNum.append(Advance.get(AttrVal.getProperty(cID)).get(1)); 
+			C_DocType_ID = 1000049; sDocNum.append("A");} 
+		else if ((Closing.get(AttrVal.getProperty(cID))!=null)&&
+				(Closing.get(AttrVal.getProperty(cID)).get(1)!=null)) {
+			sPriDocNum.append(Closing.get(AttrVal.getProperty(cID)).get(1));
+			C_DocType_ID = 1000048; sDocNum.append("C");}
+		else if ((Operation.get(AttrVal.getProperty(cID))!=null)&&
+				(Operation.get(AttrVal.getProperty(cID)).get(1)!=null)) {
+			sPriDocNum.append(Operation.get(AttrVal.getProperty(cID)).get(1));
+			C_DocType_ID = 1000047; sDocNum.append("O");
+		}	   	
+
+		//if (!"ERP-011".equals(sPriDocNum.toString())) return;
+		int iJBID = 0;
+		StringBuffer sql = new StringBuffer ();
+		if (pJournalBatch.getProperty(sDocNum.toString())!=null)
+				iJBID = Integer.valueOf(pJournalBatch.getProperty(sDocNum.toString()));
+        if (iJBID < 1 ) {  
+        	 sql.append("SELECT GL_JournalBatch_ID FROM GL_JournalBatch "
+        					+ " WHERE DocumentNo = "+ "'"+sDocNum+"'");
+        	if (SingleSQLSelect(sql.toString())) iJBID = Integer.valueOf(sRes1);
+        }
+		if (iJBID<0) iJBID = 0;
 		DateFormat formatter = new SimpleDateFormat("dd.MM.yy");
 		Date date = (Date)formatter.parse(AttrVal.getProperty(cDocDate));
-		java.sql.Timestamp DateOrdered = new Timestamp(date.getTime());
-		//date = (Date)formatter.parse(AttrVal.getProperty("EntryDate"));
-		//java.sql.Timestamp DateAcct = new Timestamp(date.getTime());
-		
-		MOrder order = new MOrder(ctx, iOrderID, null);
-		order.setClientOrg (AD_Client_ID, AD_Org_ID);
-		order.setC_DocTypeTarget_ID(iSODocTypeID);
-		order.setC_DocType_ID(iSODocTypeID);
-		order.setIsSOTrx(true);
-		order.setDocumentNo(AttrVal.getProperty(cDocNum));
-		sBPCode = AttrVal.getProperty("BusinessPartner");
-		if ((sBPCode!=null) && ( BP.get(sBPCode)!=null))
-			order.setC_BPartner_ID(Integer.valueOf(BP.get(sBPCode).get(0)));
-		else {		
-			Log.log(Level.SEVERE, "BP not found: "+sBPCode);
-			return;}
-		order.setDescription(AttrVal.getProperty("NameServices"));
-		order.setProcessed(false);
-		order.setDateOrdered(DateOrdered);
-		order.setDatePromised(DateOrdered);
-		order.setM_Warehouse_ID(1000000);
-		order.setSalesRep_ID(1000000);
-		//order.setDateAcct(DateAcct);
-		order.save();
-		lineNo = 10;
-		
-		for (i=0;i<lAttrVal.size()-1;i++) {
-			childAttrVal = lAttrVal.get(i+1);
-			
-			/*for (Enumeration e = childAttrVal.propertyNames(); e.hasMoreElements();) {
-				String sName = childAttrVal.getProperty(e.nextElement().toString());
-				if (sName.indexOf("0___8477___0")>0) sBDR = sName; 
-				if (sName.indexOf("0___9473___0")>0) sBPCode = sName; 
-			}*/
-			//	New Invoice Line
-/*			MOrderLine line;
-			if (iOrderID == 0) line = new MOrderLine(order);
-			else { 
-				sql = "SELECT c_orderline_id FROM c_orderline"
-			  			+ " WHERE ad_client_id = " + AD_Client_ID
-			  			+ " AND isactive='Y'"  			
-			  			+ " AND c_order_id = '" + iOrderID + "'"
-			  			+ " AND line = '" + lineNo + "'";
-					if (SingleSQLSelect(sql)) 
-						line = new MOrderLine(ctx, Integer.valueOf(sRes1), sTrxName);
-					else line = new MOrderLine(order);
-			}	
-			line.setLine(lineNo);
-			line.setDescription(childAttrVal.getProperty("Name1"));
-			BigDecimal bdQuantity = new BigDecimal("1");
-			if (!"0".equals(childAttrVal.getProperty("Quantity")))
-				   bdQuantity = new BigDecimal(childAttrVal.getProperty("Quantity"));
+		java.sql.Timestamp DateAcct = new Timestamp(date.getTime());
 
-			BigDecimal bdPrice = new BigDecimal(childAttrVal.getProperty("InAll"));
-			//BigDecimal bdVAT = new BigDecimal(childAttrVal.getProperty("NDS"));
-			line.setPrice(bdPrice);
-			line.setQty(bdQuantity);
-			//line.setFreightAmt(bdVAT);
+		MJournalBatch batch = new MJournalBatch (ctx, iJBID, sTrxName);
+		batch.setClientOrg(AD_Client_ID, AD_Org_ID);
+		batch.setDocumentNo (sDocNum.toString());
+		batch.setDescription("Import from 1C. "+AttrVal.getProperty("Description"));
+		batch.setC_DocType_ID(C_DocType_ID);
+		batch.setGL_Category_ID (1000002);
+		batch.setPostingType("A");
+		batch.setDateAcct(DateAcct);
+		batch.setDateDoc (DateAcct);
+		batch.setC_Currency_ID(341);
+		if (!batch.save())
+			Log.log(Level.SEVERE, "Batch not saved");
+		if (pJournalBatch.getProperty(sDocNum.toString())==null)
+			pJournalBatch.setProperty(sDocNum.toString(), 
+					String.valueOf(batch.getGL_JournalBatch_ID()));
+//************ batch
+
+//************ journal
+		int iJID = 0;
+		sql.setLength(0);
+		sql.append("SELECT GL_Journal_ID FROM GL_Journal "
+  	      + " WHERE DocumentNo = "+"'"+ sPriDocNum+"'"
+  	      + " AND  GL_JournalBatch_ID = "+ batch.getGL_JournalBatch_ID());
+		if (SingleSQLSelect(sql.toString())) 
+		   iJID = Integer.valueOf(sRes1);
+		if (iJID<0) iJID = 0;
+		MJournal journal = new MJournal (ctx, iJID, sTrxName);
+		journal.setGL_JournalBatch_ID(batch.getGL_JournalBatch_ID());
+		journal.setClientOrg(AD_Client_ID, AD_Org_ID);
+		//
+		journal.setDescription (batch.getDescription());
+		journal.setDocumentNo (sPriDocNum.toString());
+		//
+		journal.setC_AcctSchema_ID (1000000);
+		journal.setC_DocType_ID (C_DocType_ID);
+		journal.setGL_Category_ID (batch.getGL_Category_ID());
+		journal.setPostingType (batch.getPostingType());
+		//journal.setGL_Budget_ID(batch.getGL_Category_ID());
+		//
+		journal.setCurrency (batch.getC_Currency_ID(), 114, new BigDecimal("1"));
+		//
+		//journal.setC_Period_ID(batch.getC_Period_ID());
+		journal.setDateAcct(batch.getDateAcct());		//	sets Period if not defined
+		journal.setDateDoc (batch.getDateDoc());
+		//
+		if (!journal.save())
+		{
+			Log.log(Level.SEVERE, "Journal not saved");
+		} System.out.println(batch.getDocumentNo()+ " " +journal.getDocumentNo());
+		
+
+//************ Lines		
+		int i=0;
+		int iBDR, iBDDS, iDS;
+		for (i=0;i<lAttrVal.size()-1;i++) {
+			Properties childAttrVal = lAttrVal.get(i+1);
+			if(    (childAttrVal.getProperty("AccountD")==null) 
+				|| (Account.get(childAttrVal.getProperty("AccountD"))==null)
+				|| (childAttrVal.getProperty("AccountC")==null) 
+				|| (Account.get(childAttrVal.getProperty("AccountC"))==null)
+					) continue;
+			//	Lines
+			int iJLID = 0, iLine = i*20+10;
+			iBDR = iBDDS = iDS = 0;			
+			sql.setLength(0);
+			sql.append("SELECT GL_JournalLine_ID FROM GL_JournalLine "
+	  	      + " WHERE GL_Journal_ID = "+journal.get_ID()
+	  	      + " AND line = "+ iLine);
+			if (SingleSQLSelect(sql.toString()))
+			    iJLID = Integer.valueOf(sRes1);
+			MJournalLine line;
+			if (iJLID>0) line = new MJournalLine (ctx,iJLID,sTrxName);
+			else line = new MJournalLine (journal);
+			//
+			line.setDescription(journal.getDescription());
+			line.setCurrency (journal.getC_Currency_ID(), journal.getC_ConversionType_ID(), 
+					journal.getCurrencyRate());
+			sql.setLength(0);
+			String sAcc = null;
+			String sBP = null;
 			
-			line.setC_Tax_ID(Integer.valueOf(VAT.get(childAttrVal.getProperty("RateNDS")).get(0)));
-//			line.setName(AttrVal.getProperty(cDocNum));
-			line.save();
-			lineNo += 10;
-			if (order != null) {
-				//invoice.processIt (p_DocAction);
-				order.save();
-			}		
-		}*/
+			for (@SuppressWarnings("rawtypes")
+			Enumeration e = childAttrVal.propertyNames(); e.hasMoreElements();)	{
+				String sElement = e.nextElement().toString();
+				String sName = childAttrVal.getProperty(sElement);
+				if ((  sName.indexOf("0___9473___0")>0
+					|sName.indexOf("0___9697___0")>0)
+					&sName.indexOf("9473___0___0________16036ERP")<0) { 
+					sBP = sName;
+				} if (sElement.indexOf("contoC")>0) {
+						continue;
+				} else if (sName.indexOf("0___8477___0")>0) {
+					if (BDR.get(sName)!= null) iBDR = Integer.valueOf(BDR.get(sName).get(0));
+				} else if (sName.indexOf("0___9410___0")>0) {
+					if (DS.get(sName)!= null) iDS = Integer.valueOf(DS.get(sName).get(0));
+				} else if (sName.indexOf("0___8473___0")>0) {
+					if (BDDS.get(sName)!= null) iBDDS = Integer.valueOf(BDDS.get(sName).get(0));
+				}
+			}
+
+			if((childAttrVal.getProperty("AccountD")!=null) &&
+					(Account.get(childAttrVal.getProperty("AccountD"))!=null))
+					sAcc = childAttrVal.getProperty("AccountD");
+
+			iJLID = findValidCombination(sAcc,sBP);
+			if(iJLID<1) { 
+				System.out.print("Combination not found! Sum:"+
+						  	childAttrVal.getProperty("Sum")+" Line:"+ (i+1)); 
+				if ((sAcc!=null) && (Account.get(sAcc)!=null)) 
+					System.out.println(" Account: "+ Account.get(sAcc).get(2)
+							+" " +BP.get(sBP).get(2));
+				else System.out.println("");
+				continue; 
+			}
+			line.setC_ValidCombination_ID(iJLID);
+			line.setLine (iLine);
+			BigDecimal bSum;
+			if (childAttrVal.getProperty("Sum")!=null)
+				bSum = new BigDecimal(childAttrVal.getProperty("Sum"));
+			else bSum = new BigDecimal("0");
+			line.setAmtSourceDr (bSum);
+			//line.setAmtAcct (bSum, bSum);	//	only if not 0
+			line.setDateAcct (journal.getDateAcct());
+			//
+			line.setERPS_stati_BDR_ID(iBDR);
+			line.setERPS_denejnie_sredstva_ID(iDS);
+			line.setERPS_stati_BDDS_ID(iBDDS);
+			//line.setC_UOM_ID(imp.getC_UOM_ID());
+			line.setQty(new BigDecimal("0"));
+			//
+			if (!line.save()) {
+				Log.log(Level.SEVERE, "Journal Line not saved");
+			} 	
+			
+			iLine= (i+1)*20;
+			sql.setLength(0);
+			iJLID = 0;
+			iBDR = iBDDS = iDS = 0;			
+			sql.append("SELECT GL_JournalLine_ID FROM GL_JournalLine "
+	  	      + " WHERE GL_Journal_ID = "+journal.get_ID()
+	  	      + " AND line = "+ iLine);
+			if(SingleSQLSelect(sql.toString())) iJLID = Integer.valueOf(sRes1);
+			if (iJLID>0) line = new MJournalLine (ctx,iJLID,sTrxName);
+			else line = new MJournalLine (journal);
+			//
+			line.setDescription(journal.getDescription());
+			line.setCurrency (journal.getC_Currency_ID(), journal.getC_ConversionType_ID(), 
+					journal.getCurrencyRate());
+			sAcc = null;
+			sBP = null;
+			for (@SuppressWarnings("rawtypes")
+			Enumeration e = childAttrVal.propertyNames(); e.hasMoreElements();)	{
+				String sElement = e.nextElement().toString();
+				String sName = childAttrVal.getProperty(sElement);
+				if ((  sName.indexOf("0___9473___0")>0
+						|sName.indexOf("0___9697___0")>0)
+						&sName.indexOf("9473___0___0________16036ERP")<0) { 
+						sBP = sName;
+				} if (sElement.indexOf("contoD")>0) {
+					continue;
+				} else if (sName.indexOf("0___8477___0")>0) {
+					if (BDR.get(sName)!= null) iBDR = Integer.valueOf(BDR.get(sName).get(0));
+				} else if (sName.indexOf("0___9410___0")>0) {
+					if (DS.get(sName)!= null) iDS = Integer.valueOf(DS.get(sName).get(0));
+				} else if (sName.indexOf("0___8473___0")>0) {
+					if (BDDS.get(sName)!= null) iBDDS = Integer.valueOf(BDDS.get(sName).get(0));
+				}
+			}
+			
+			if((childAttrVal.getProperty("AccountC")!=null) &&
+				(Account.get(childAttrVal.getProperty("AccountC"))!=null))
+				sAcc = childAttrVal.getProperty("AccountC");
+			iJLID = findValidCombination(sAcc,sBP);
+			if(iJLID<1) { System.out.print("Combination not found! Sum:"+
+					   childAttrVal.getProperty("Sum")+" Line:"+(i+1)); 
+				if ((sAcc!=null) && (Account.get(sAcc)!=null)) 
+					System.out.println(" Account: "+ Account.get(sAcc).get(2)
+							+" " +BP.get(sBP).get(2));
+				else System.out.println("");
+				continue; 
+			}
+			line.setC_ValidCombination_ID(iJLID);
+			line.setLine (iLine);
+			line.setAmtSourceCr (bSum);
+			line.setDateAcct (journal.getDateAcct());
+			line.setERPS_stati_BDR_ID(iBDR);
+			line.setERPS_denejnie_sredstva_ID(iDS);
+			line.setERPS_stati_BDDS_ID(iBDDS);
+			//line.setC_UOM_ID(imp.getC_UOM_ID());
+			line.setQty(new BigDecimal("0"));
+			if (!line.save()) {
+				Log.log(Level.SEVERE, "Journal Line not saved");
+			} 	
+			
+			
+		}	
 	}	
 /************* Import Issued Invoice from 1C **************/	
 }
