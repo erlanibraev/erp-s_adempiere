@@ -1,4 +1,4 @@
-﻿package org.compiere.wf;
+package org.compiere.wf;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

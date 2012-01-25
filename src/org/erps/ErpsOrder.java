@@ -1,4 +1,4 @@
-﻿package org.erps;
+package org.erps;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

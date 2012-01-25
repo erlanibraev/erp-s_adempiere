@@ -1,4 +1,4 @@
-﻿package org.compiere.model;
+package org.compiere.model;
 
 import java.sql.PreparedStatement;
 import org.erps.ErpsEncoder;
