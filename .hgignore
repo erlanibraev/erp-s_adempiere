@@ -1,7 +1,15 @@
 syntax: glob
 build
 buildJava
+?
+?.bat
+*.log
+temp
+temp.*
+Thumbs.db
 
 syntax: regexp
 
 ^zkwebui/WEB-INF/classes$
+^_
+^.
