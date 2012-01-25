@@ -11,5 +11,3 @@ Thumbs.db
 syntax: regexp
 
 ^zkwebui/WEB-INF/classes$
-^_
-^.
