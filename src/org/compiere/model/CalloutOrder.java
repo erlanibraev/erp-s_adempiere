@@ -1129,6 +1129,13 @@ public class CalloutOrder extends CalloutEngine
 					MTax tax = new MTax (ctx, C_Tax_ID, null);
 					TaxAmt = tax.calculateTax(LineNetAmt, isTaxIncluded(WindowNo), StdPrecision);
 					mTab.setValue("TaxAmt", TaxAmt);
+					
+					//A.Nurpiisov 03.02.2012 - 18:18 {
+					if (!isTaxIncluded(WindowNo)){
+							PriceActual = PriceActual.subtract(TaxAmt);
+							mTab.setValue ("PriceActual", PriceActual);
+					}
+					//}					
 				}
 			}
 			//	Add it up
