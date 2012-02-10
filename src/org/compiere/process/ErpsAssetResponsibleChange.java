@@ -11,7 +11,7 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 
 	private int	p_erp_TransDoc_ID;	
 	private int	p_erp_C_BPartner_ID;	
-	private int	p_erp_A_Asset_ID;	
+	private Integer	p_erp_A_Asset_ID;	
 	private String finalMsg;
 	
 	private ErpsEncoder encoder = new ErpsEncoder();	
@@ -61,7 +61,7 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 					pstmt = null;
 					pstmt = DB.prepareStatement(sql_empl_upd, get_TrxName());
 					pstmt.execute();
-					log.log(Level.SEVERE, new Integer(p_erp_A_Asset_ID).toString());
+					log.log(Level.INFO, p_erp_A_Asset_ID.toString());
 					finalMsg = encoder.encodeUTF8("Основное средство № " + new Integer(p_erp_A_Asset_ID).toString() + " изменено...");
 				} else {
 					if (p_erp_A_Asset_ID == 0) {
