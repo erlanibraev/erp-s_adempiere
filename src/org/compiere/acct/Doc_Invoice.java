@@ -49,7 +49,7 @@ import org.compiere.util.Env;
  *  
  *  @version  $Id: Doc_Invoice.java,v 1.2 2006/07/30 00:53:33 jjanke Exp $
  */
-public class Doc_Invoice extends Doc
+public class Doc_Invoice extends DocMy
 {
 	/**
 	 *  Constructor
@@ -681,9 +681,18 @@ public class Doc_Invoice extends Doc
 					fLines[i].setLocationFromOrg(fLines[i].getAD_Org_ID(), false);    //  to Loc
 				}
 			}
-			//  Liability       DR
-			int payables_ID = getValidCombination_ID (Doc.ACCTTYPE_V_Liability, as);
-			int payablesServices_ID = getValidCombination_ID (Doc.ACCTTYPE_V_Liability_Services, as);
+			
+			// Liability CR
+			int payables_ID;
+			int payablesServices_ID;
+			if (getC_DocType_ID() == 1000046) {
+				payables_ID = getValidCombination_ID_Advance(Doc.ACCTTYPE_V_Liability, as);
+				payablesServices_ID = getValidCombination_ID_Advance(Doc.ACCTTYPE_V_Liability_Services, as);
+			} else {
+				payables_ID = getValidCombination_ID(Doc.ACCTTYPE_V_Liability,as);
+				payablesServices_ID = getValidCombination_ID(Doc.ACCTTYPE_V_Liability_Services, as);
+			}
+			
 			if (m_allLinesItem || !as.isPostServices() 
 				|| payables_ID == payablesServices_ID)
 			{

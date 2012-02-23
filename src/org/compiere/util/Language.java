@@ -101,7 +101,7 @@ public class Language implements Serializable
 			MediaSize.NA.LETTER),							    //  Base Language
 		//	ordered by locale
 		//	Not predefined Locales - need to define decimal Point and date pattern (not sure about time)
-		/*new Language ("\uFE94\uFEF4\uFE91\uFEAE\uFECC\uFEDF\uFE8D (AR)",
+		new Language ("\uFE94\uFEF4\uFE91\uFEAE\uFECC\uFEDF\uFE8D (AR)",
 			AD_Language_ar_TN,  new Locale("ar","TN"), new Boolean(true), "dd.MM.yyyy",
 			MediaSize.ISO.A4),
 		new Language ("\u0411\u044A\u043B\u0433\u0430\u0440\u0441\u043A\u0438 (BG)",
@@ -190,10 +190,10 @@ public class Language implements Serializable
 			MediaSize.ISO.A4),
 		new Language ("Rom\u00e2n\u0103",
 			AD_Language_ro_RO, new Locale("ro","RO"), new Boolean(false), "dd.MM.yyyy",
-			MediaSize.ISO.A4),*/
+			MediaSize.ISO.A4),
 		new Language ("\u0420\u0443\u0441\u0441\u043a\u0438\u0439 (Russian)",
 			AD_Language_ru_RU, new Locale("ru","RU"), new Boolean(false), "dd-MM-yyyy",
-			MediaSize.ISO.A4)/*,
+			MediaSize.ISO.A4),
 		new Language ("Slovenski",
 			AD_Language_sl_SI, new Locale("sl", "SI"), null, "dd.MM.yyyy",
 			MediaSize.ISO.A4),
@@ -215,7 +215,7 @@ public class Language implements Serializable
 			MediaSize.ISO.A4),
 		new Language ("\u7e41\u9ad4\u4e2d\u6587 (TW)",
 			AD_Language_zh_TW,  Locale.TAIWAN,  null, null,		//  dd.MM.yy
-			MediaSize.ISO.A4)*/
+			MediaSize.ISO.A4)
 
 	};
 	/** Default Language            */
