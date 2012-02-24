@@ -315,6 +315,8 @@ public class InfoCashLine extends Info
 		if (fCharge_ID.getValue() != null) {
 			sql.append(" AND cl.").append(MCashLine.COLUMNNAME_C_Charge_ID).append("=?");
 		}
+		//
+		sql.append(" AND c.Posted='Y' AND cl.OverUnderAmt != 0 ");
 
 		log.fine(sql.toString());
 		return sql.toString();

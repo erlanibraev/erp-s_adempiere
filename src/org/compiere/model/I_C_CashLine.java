@@ -303,6 +303,9 @@ public interface I_C_CashLine
 
     /** Column name WriteOffAmt */
     public static final String COLUMNNAME_WriteOffAmt = "WriteOffAmt";
+    
+    /** Column name OverUnderAmt */
+    public static final String COLUMNNAME_OverUnderAmt = "OverUnderAmt";
 
 	/** Set Write-off Amount.
 	  * Amount to write-off

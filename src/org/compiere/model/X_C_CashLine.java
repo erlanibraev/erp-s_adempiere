@@ -98,6 +98,27 @@ public class X_C_CashLine extends PO implements I_C_CashLine, I_Persistent
 			 return Env.ZERO;
 		return bd;
 	}
+	
+	/** Set OverUnderAmt.
+	@param OverUnderAmt 
+	OverUnderAmt in a defined currency
+	 */
+	public void setOverUnderAmt (BigDecimal OverUnderAmt)
+	{
+		set_Value (COLUMNNAME_OverUnderAmt, OverUnderAmt);
+	}
+
+	/** Get OverUnderAmt.
+	@return OverUnderAmt in a defined currency
+	 */
+	public BigDecimal getOverUnderAmt () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_OverUnderAmt);
+		if (bd == null)
+			return Env.ZERO;
+		return bd;
+	}
+
 
 	/** CashType AD_Reference_ID=217 */
 	public static final int CASHTYPE_AD_Reference_ID=217;
