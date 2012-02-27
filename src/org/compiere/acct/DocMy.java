@@ -13,6 +13,13 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 
 public class DocMy extends Doc {
+	
+	/** Account Type - Cash     - Asset */
+	public static final int     ACCTTYPE_CashAssetAdvance = 1;
+	
+	/** Account Type - Cash     - Asset */
+	public static final int     ACCTTYPE_CashTransferAdvance = 2;
+	
 
 	DocMy(MAcctSchema[] ass, Class<?> clazz, ResultSet rs,
 			String defaultDocumentType, String trxName) {
@@ -173,6 +180,20 @@ public class DocMy extends Doc {
 		} else if (AcctType == ACCTTYPE_CommitmentOffsetSales) {
 			sql = "SELECT CommitmentOffsetSales_Acct FROM C_AcctSchema_GL WHERE C_AcctSchema_ID=?";
 			para_1 = -1;
+		}
+		/** Advance type */
+		else if(AcctType == ACCTTYPE_CashAssetAdvance){
+			sql = "SELECT CB_Asset_Acct FROM C_CashBook_Acct WHERE C_CashBook_ID=? AND C_AcctSchema_ID=?";
+			para_1 = getC_CashBook_ID();
+		}
+		else if(AcctType == ACCTTYPE_CashTransferAdvance){
+			if (getC_BPartner_ID() == 0) {
+				log.log(Level.SEVERE, "C_BPartner_ID is null");
+				throw new AdempiereException("Не выбран Бизнесс-партнер");
+			} else {
+				sql = "select e_expense_acct from adempiere.c_bp_employee_acct t where t.c_bpartner_id=? and t.C_AcctSchema_ID=?";
+				para_1 = getC_BPartner_ID();
+			}
 		}
 
 		else {

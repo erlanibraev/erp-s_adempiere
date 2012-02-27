@@ -141,7 +141,7 @@ public class InfoCashLine extends Info
 		new Info_Column(Msg.translate(Env.getCtx(), "Amount"),
 			"cl.Amount",  BigDecimal.class, true, true, null),
 		new Info_Column(Msg.translate(Env.getCtx(), "OverUnderAmt"),
-			"cl.OverUnderAmt", String.class),
+					"cl.OverUnderAmt",  BigDecimal.class, true, true, null),
 		//
 		//new Info_Column(Msg.translate(Env.getCtx(), "C_Invoice_ID"),
 		//	"(SELECT i.DocumentNo||'_'||" + DB.TO_CHAR("i.DateInvoiced",DisplayType.Date,Env.getAD_Language(Env.getCtx()))
@@ -316,7 +316,7 @@ public class InfoCashLine extends Info
 			sql.append(" AND cl.").append(MCashLine.COLUMNNAME_C_Charge_ID).append("=?");
 		}
 		//
-		sql.append(" AND c.Posted='Y' AND cl.OverUnderAmt != 0 ");
+		sql.append(" AND c.Posted='Y' AND cl.OverUnderAmt != 0 AND cl.CashType = 'A' ");
 
 		log.fine(sql.toString());
 		return sql.toString();

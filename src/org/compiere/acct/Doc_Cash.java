@@ -38,6 +38,10 @@ import org.compiere.util.Env;
  */
 public class Doc_Cash extends DocMy
 {
+	
+	/** Advance - A 	*/
+	protected static final String  CASHTYPE_ADVANCE = "A";
+	
 	/**
 	 *  Constructor
 	 * 	@param ass accounting schemata
@@ -241,6 +245,20 @@ public class Doc_Cash extends DocMy
 					fact.createLine(line,
 						getAccount(Doc.ACCTTYPE_CashAsset, as),
 						line.getC_Currency_ID(), line.getAmount());
+			}
+			else if (CashType.equals(CASHTYPE_ADVANCE))
+			{   //  amount is pos/neg
+				//  CashAsset       DR      dr      --   Invoice is in Invoice Currency !
+				//  CashTransfer    cr      CR
+				if (line.getC_Currency_ID() == getC_Currency_ID())
+					assetAmt = assetAmt.add (line.getAmount());
+				else
+					fact.createLine(line,
+						getAccount(DocMy.ACCTTYPE_CashAssetAdvance, as),
+						line.getC_Currency_ID(), line.getAmount());
+				fact.createLine(line,
+					getAccount(DocMy.ACCTTYPE_CashTransferAdvance, as),
+					line.getC_Currency_ID(), line.getAmount().negate());
 			}
 		}	//  lines
 
