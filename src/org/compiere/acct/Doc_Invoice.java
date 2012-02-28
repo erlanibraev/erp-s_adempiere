@@ -108,11 +108,13 @@ public class Doc_Invoice extends DocMy
 				pstmt.setObject(1, Amt.subtract(cll.getPriceEntered()));
 			} catch (SQLException e1) {
 				e1.printStackTrace();
+				log.log(Level.SEVERE, "1) upd OverUnderAmt "+ e1.getMessage());
 			}
 			try {
 				pstmt.setInt(2, cl.get_ID());
 			} catch (SQLException e1) {
 				e1.printStackTrace();
+				log.log(Level.SEVERE, "2) upd OverUnderAmt "+ e1.getMessage());
 			}
 			try{
 				pstmt.execute();
@@ -123,6 +125,7 @@ public class Doc_Invoice extends DocMy
 					pstmt.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
+					log.log(Level.SEVERE, "3) close upd OverUnderAmt "+ e.getMessage());
 				}
 				pstmt = null;
 			}
