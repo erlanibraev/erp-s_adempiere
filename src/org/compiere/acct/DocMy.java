@@ -41,11 +41,11 @@ public class DocMy extends Doc {
 		return null;
 	}
 
-	public int getValidCombination_ID(int AcctType, MAcctSchema as) {
+	/*public int getValidCombination_ID(int AcctType, MAcctSchema as) {
 		int para_1 = 0; // first parameter (second is always AcctSchema)
 		String sql = null;
 
-		/** Account Type - Invoice */
+		*//** Account Type - Invoice *//*
 		if (AcctType == ACCTTYPE_Charge) // see getChargeAccount in DocLine
 		{
 			int cmp = getAmount(AMTTYPE_Charge).compareTo(Env.ZERO);
@@ -82,7 +82,7 @@ public class DocMy extends Doc {
 			para_1 = getC_BPartner_ID();
 		}
 
-		/** Account Type - Payment */
+		*//** Account Type - Payment *//*
 		else if (AcctType == ACCTTYPE_UnallocatedCash) {
 			sql = "SELECT B_UnallocatedCash_Acct FROM C_BankAccount_Acct WHERE C_BankAccount_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_BankAccount_ID();
@@ -94,7 +94,7 @@ public class DocMy extends Doc {
 			para_1 = getC_BankAccount_ID();
 		}
 
-		/** Account Type - Allocation */
+		*//** Account Type - Allocation *//*
 		else if (AcctType == ACCTTYPE_DiscountExp) {
 			sql = "SELECT a.PayDiscount_Exp_Acct FROM C_BP_Group_Acct a, C_BPartner bp "
 					+ "WHERE a.C_BP_Group_ID=bp.C_BP_Group_ID AND bp.C_BPartner_ID=? AND a.C_AcctSchema_ID=?";
@@ -109,7 +109,7 @@ public class DocMy extends Doc {
 			para_1 = getC_BPartner_ID();
 		}
 
-		/** Account Type - Bank Statement */
+		*//** Account Type - Bank Statement *//*
 		else if (AcctType == ACCTTYPE_BankAsset) {
 			sql = "SELECT B_Asset_Acct FROM C_BankAccount_Acct WHERE C_BankAccount_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_BankAccount_ID();
@@ -121,7 +121,7 @@ public class DocMy extends Doc {
 			para_1 = getC_BankAccount_ID();
 		}
 
-		/** Account Type - Cash */
+		*//** Account Type - Cash *//*
 		else if (AcctType == ACCTTYPE_CashAsset) {
 			//TODO: Advance
 			sql = "SELECT CB_Asset_Acct FROM C_CashBook_Acct WHERE C_CashBook_ID=? AND C_AcctSchema_ID=?";
@@ -149,7 +149,7 @@ public class DocMy extends Doc {
 			para_1 = getC_CashBook_ID();
 		}
 
-		/** Inventory Accounts */
+		*//** Inventory Accounts *//*
 		else if (AcctType == ACCTTYPE_InvDifferences) {
 			sql = "SELECT W_Differences_Acct FROM M_Warehouse_Acct WHERE M_Warehouse_ID=? AND C_AcctSchema_ID=?";
 			// "SELECT W_Inventory_Acct, W_Revaluation_Acct, W_InvActualAdjust_Acct FROM M_Warehouse_Acct WHERE M_Warehouse_ID=? AND C_AcctSchema_ID=?";
@@ -160,7 +160,7 @@ public class DocMy extends Doc {
 			para_1 = getC_BPartner_ID();
 		}
 
-		/** Project Accounts */
+		*//** Project Accounts *//*
 		else if (AcctType == ACCTTYPE_ProjectAsset) {
 			sql = "SELECT PJ_Asset_Acct FROM C_Project_Acct WHERE C_Project_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_Project_ID();
@@ -169,7 +169,7 @@ public class DocMy extends Doc {
 			para_1 = getC_Project_ID();
 		}
 
-		/** GL Accounts */
+		*//** GL Accounts *//*
 		else if (AcctType == ACCTTYPE_PPVOffset) {
 			sql = "SELECT PPVOffset_Acct FROM C_AcctSchema_GL WHERE C_AcctSchema_ID=?";
 			para_1 = -1;
@@ -180,7 +180,7 @@ public class DocMy extends Doc {
 			sql = "SELECT CommitmentOffsetSales_Acct FROM C_AcctSchema_GL WHERE C_AcctSchema_ID=?";
 			para_1 = -1;
 		}
-		/** Advance type (Vladimir Sokolov)*/
+		*//** Advance type (Vladimir Sokolov)*//*
 		else if(AcctType == ACCTTYPE_CashAssetAdvance){
 			sql = "SELECT CB_Asset_Acct FROM C_CashBook_Acct WHERE C_CashBook_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_CashBook_ID();
@@ -192,6 +192,7 @@ public class DocMy extends Doc {
 			} else {
 				sql = "select e_expense_acct from adempiere.c_bp_employee_acct t where t.c_bpartner_id=? and t.C_AcctSchema_ID=?";
 				para_1 = getC_BPartner_ID();
+				log.log(Level.INFO, "11 ACCTTYPE_CashTransferAdvance - AcctType = "+AcctType);
 			}
 		}// Advance type
 
@@ -236,7 +237,7 @@ public class DocMy extends Doc {
 			return 0;
 		}
 		return Account_ID;
-	}
+	}*/
 
 	protected int getValidCombination_ID_Advance(int AcctType, MAcctSchema as) {
 

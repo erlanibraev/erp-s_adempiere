@@ -36,7 +36,7 @@ import org.compiere.util.Env;
  *  @author Jorg Janke
  *  @version  $Id: Doc_Cash.java,v 1.3 2006/07/30 00:53:33 jjanke Exp $
  */
-public class Doc_Cash extends DocMy
+public class Doc_Cash extends Doc
 {
 	
 	/** Advance - A 	*/
@@ -255,10 +255,10 @@ public class Doc_Cash extends DocMy
 					assetAmt = assetAmt.add (line.getAmount());
 				else
 					fact.createLine(line,
-						getAccount(DocMy.ACCTTYPE_CashAssetAdvance, as),
+						getAccount(ACCTTYPE_CashAssetAdvance, as),
 						line.getC_Currency_ID(), line.getAmount());
 				fact.createLine(line,
-					getAccount(DocMy.ACCTTYPE_CashTransferAdvance, as),
+					getAccount(ACCTTYPE_CashTransferAdvance, as),
 					line.getC_Currency_ID(), line.getAmount().negate());
 			}
 		}	//  lines

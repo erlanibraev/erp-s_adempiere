@@ -1881,60 +1881,62 @@ public class MInvoice extends X_C_Invoice implements DocAction
 		if(getC_CashLine_ID() != 0)
 			line = new MCashLine(getCtx(), getC_CashLine_ID(), null);
 		
-		if("A".equals(line.getCashType()) && line != null){
+		if(line != null){
+			if("A".equals(line.getCashType())){
 			
-			/**	Contained Doc Lines	*/
-			MInvoiceLine[]	plines;		
-			plines = getLines();
+				/**	Contained Doc Lines	*/
+				MInvoiceLine[]	plines;		
+				plines = getLines();
 			
-			// calculate the overpayment underpayment
-			MCashLine cl = new  MCashLine(getCtx(), getC_CashLine_ID(), get_TrxName());
-			BigDecimal Amt_ = cl.getOverUnderAmt();
-			MInvoiceLine cll = new MInvoiceLine(getCtx(), plines[0].get_ID(), get_TrxName());
-			cl.setOverUnderAmt(Amt_.subtract(cll.getPriceEntered()));
-			cl.saveUpdate();			
-
-			// Check if the cash is completed - teo_sarca BF [ 1894524 ]
-			MCash cash_ = line.getParent();
-			if (   !MCash.DOCSTATUS_Completed.equals(cash_.getDocStatus())
-					&& !MCash.DOCSTATUS_Closed.equals(cash_.getDocStatus())
-					&& !MCash.DOCSTATUS_Reversed.equals(cash_.getDocStatus())
-					&& !MCash.DOCSTATUS_Voided.equals(cash_.getDocStatus())
-				)
-			{
-				m_processMsg = "@Line@ "+line.getLine()+": @CashCreateDocNotCompleted@";
-						return DocAction.STATUS_Invalid;
-			}
-			// add AllocationHdr 
-			String name = Msg.translate(getCtx(), "C_Cash_ID") + ": " + line.getParent().getName()
-							+ " - " + Msg.translate(getCtx(), "Line") + " " + line.getLine();
-			MAllocationHdr hdr = new MAllocationHdr(getCtx(), false, 
-					getDateAcct(), line.getC_Currency_ID(),
-					name, get_TrxName());
-			hdr.setAD_Org_ID(getAD_Org_ID());
-			if (!hdr.save())
-			{
-				m_processMsg = CLogger.retrieveErrorString("Could not create Allocation Hdr");
-				return DocAction.STATUS_Invalid;
-			}
-			//	Allocation Line
-			MAllocationLine aLine = new MAllocationLine (hdr, line.getAmount(),
-				line.getDiscountAmt(), line.getWriteOffAmt(), Env.ZERO);
-			aLine.setC_Invoice_ID(line.getC_Invoice_ID());
-			aLine.setC_CashLine_ID(line.getC_CashLine_ID());
-			if (!aLine.save())
-			{
-				m_processMsg = CLogger.retrieveErrorString("Could not create Allocation Line");
-				return DocAction.STATUS_Invalid;
-			}
-			//	Should start WF
-			if(!hdr.processIt(DocAction.ACTION_Complete)) {
-				m_processMsg = CLogger.retrieveErrorString("Could not process Allocation");
-				return DocAction.STATUS_Invalid;
-			}
-			if (!hdr.save()) {
-				m_processMsg = CLogger.retrieveErrorString("Could not save Allocation");
-				return DocAction.STATUS_Invalid;
+				// calculate the overpayment underpayment
+				MCashLine cl = new  MCashLine(getCtx(), getC_CashLine_ID(), get_TrxName());
+				BigDecimal Amt_ = cl.getOverUnderAmt();
+				MInvoiceLine cll = new MInvoiceLine(getCtx(), plines[0].get_ID(), get_TrxName());
+				cl.setOverUnderAmt(Amt_.subtract(cll.getPriceEntered()));
+				cl.saveUpdate();			
+	
+				// Check if the cash is completed - teo_sarca BF [ 1894524 ]
+				MCash cash_ = line.getParent();
+				if (   !MCash.DOCSTATUS_Completed.equals(cash_.getDocStatus())
+						&& !MCash.DOCSTATUS_Closed.equals(cash_.getDocStatus())
+						&& !MCash.DOCSTATUS_Reversed.equals(cash_.getDocStatus())
+						&& !MCash.DOCSTATUS_Voided.equals(cash_.getDocStatus())
+					)
+				{
+					m_processMsg = "@Line@ "+line.getLine()+": @CashCreateDocNotCompleted@";
+							return DocAction.STATUS_Invalid;
+				}
+				// add AllocationHdr 
+				String name = Msg.translate(getCtx(), "C_Cash_ID") + ": " + line.getParent().getName()
+								+ " - " + Msg.translate(getCtx(), "Line") + " " + line.getLine();
+				MAllocationHdr hdr = new MAllocationHdr(getCtx(), false, 
+						getDateAcct(), line.getC_Currency_ID(),
+						name, get_TrxName());
+				hdr.setAD_Org_ID(getAD_Org_ID());
+				if (!hdr.save())
+				{
+					m_processMsg = CLogger.retrieveErrorString("Could not create Allocation Hdr");
+					return DocAction.STATUS_Invalid;
+				}
+				//	Allocation Line
+				MAllocationLine aLine = new MAllocationLine (hdr, line.getAmount(),
+					line.getDiscountAmt(), line.getWriteOffAmt(), Env.ZERO);
+				aLine.setC_Invoice_ID(line.getC_Invoice_ID());
+				aLine.setC_CashLine_ID(line.getC_CashLine_ID());
+				if (!aLine.save())
+				{
+					m_processMsg = CLogger.retrieveErrorString("Could not create Allocation Line");
+					return DocAction.STATUS_Invalid;
+				}
+				//	Should start WF
+				if(!hdr.processIt(DocAction.ACTION_Complete)) {
+					m_processMsg = CLogger.retrieveErrorString("Could not process Allocation");
+					return DocAction.STATUS_Invalid;
+				}
+				if (!hdr.save()) {
+					m_processMsg = CLogger.retrieveErrorString("Could not save Allocation");
+					return DocAction.STATUS_Invalid;
+				}
 			}
 		}//// END - Vladimir Sokolov 
 		

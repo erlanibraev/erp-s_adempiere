@@ -579,8 +579,16 @@ public class Doc_Invoice extends DocMy
 			}
 
 			//  Liability               CR
-			int payables_ID = getValidCombination_ID (Doc.ACCTTYPE_V_Liability, as);
-			int payablesServices_ID = getValidCombination_ID (Doc.ACCTTYPE_V_Liability_Services, as);
+			int payables_ID;
+			int payablesServices_ID;
+			if (getC_DocType_ID() == 1000046) {
+				payables_ID = getValidCombination_ID_Advance(Doc.ACCTTYPE_V_Liability, as);
+				payablesServices_ID = getValidCombination_ID_Advance(Doc.ACCTTYPE_V_Liability_Services, as);
+			} else {
+				payables_ID = getValidCombination_ID(Doc.ACCTTYPE_V_Liability,as);
+				payablesServices_ID = getValidCombination_ID(Doc.ACCTTYPE_V_Liability_Services, as);
+			}
+			
 			if (m_allLinesItem || !as.isPostServices() 
 				|| payables_ID == payablesServices_ID)
 			{
@@ -685,15 +693,8 @@ public class Doc_Invoice extends DocMy
 			}
 			
 			// Liability CR
-			int payables_ID;
-			int payablesServices_ID;
-			if (getC_DocType_ID() == 1000046) {
-				payables_ID = getValidCombination_ID_Advance(Doc.ACCTTYPE_V_Liability, as);
-				payablesServices_ID = getValidCombination_ID_Advance(Doc.ACCTTYPE_V_Liability_Services, as);
-			} else {
-				payables_ID = getValidCombination_ID(Doc.ACCTTYPE_V_Liability,as);
-				payablesServices_ID = getValidCombination_ID(Doc.ACCTTYPE_V_Liability_Services, as);
-			}
+			int payables_ID = getValidCombination_ID(Doc.ACCTTYPE_V_Liability,as);
+			int payablesServices_ID = getValidCombination_ID(Doc.ACCTTYPE_V_Liability_Services, as);
 			
 			if (m_allLinesItem || !as.isPostServices() 
 				|| payables_ID == payablesServices_ID)
