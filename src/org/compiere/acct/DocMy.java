@@ -15,10 +15,10 @@ import org.compiere.util.Env;
 public class DocMy extends Doc {
 	
 	/** Account Type - Cash     - Asset */
-	public static final int     ACCTTYPE_CashAssetAdvance = 1;
+	public static final int     ACCTTYPE_CashAssetAdvance = 111;
 	
 	/** Account Type - Cash     - Asset */
-	public static final int     ACCTTYPE_CashTransferAdvance = 2;
+	public static final int     ACCTTYPE_CashTransferAdvance = 222;
 	
 
 	DocMy(MAcctSchema[] ass, Class<?> clazz, ResultSet rs,
@@ -57,17 +57,15 @@ public class DocMy extends Doc {
 				sql = "SELECT CH_Revenue_Acct FROM C_Charge_Acct WHERE C_Charge_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_Charge_ID();
 		} else if (AcctType == ACCTTYPE_V_Liability) {
-			// sql =
-			// "SELECT V_Liability_Acct FROM C_BP_Vendor_Acct WHERE C_BPartner_ID=? AND C_AcctSchema_ID=?";
-			// para_1 = getC_BPartner_ID();
-			sql = "select e_expense_acct from adempiere.c_bp_employee_acct t where t.c_bpartner_id=? and t.C_AcctSchema_ID=?";
-			para_1 = getC_BPartner_ID();
+			 sql = "SELECT V_Liability_Acct FROM C_BP_Vendor_Acct WHERE C_BPartner_ID=? AND C_AcctSchema_ID=?";
+			 para_1 = getC_BPartner_ID();
+			//sql = "select e_expense_acct from adempiere.c_bp_employee_acct t where t.c_bpartner_id=? and t.C_AcctSchema_ID=?";
+			//para_1 = getC_BPartner_ID();
 		} else if (AcctType == ACCTTYPE_V_Liability_Services) {
-			// sql =
-			// "SELECT V_Liability_Services_Acct FROM C_BP_Vendor_Acct WHERE C_BPartner_ID=? AND C_AcctSchema_ID=?";
-			// para_1 = getC_BPartner_ID();
-			sql = "select e_expense_acct from adempiere.c_bp_employee_acct t where t.c_bpartner_id=? and t.C_AcctSchema_ID=?";
-			para_1 = getC_BPartner_ID();
+			 sql = "SELECT V_Liability_Services_Acct FROM C_BP_Vendor_Acct WHERE C_BPartner_ID=? AND C_AcctSchema_ID=?";
+			 para_1 = getC_BPartner_ID();
+			//sql = "select e_expense_acct from adempiere.c_bp_employee_acct t where t.c_bpartner_id=? and t.C_AcctSchema_ID=?";
+			//para_1 = getC_BPartner_ID();
 		} else if (AcctType == ACCTTYPE_C_Receivable) {
 			sql = "SELECT C_Receivable_Acct FROM C_BP_Customer_Acct WHERE C_BPartner_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_BPartner_ID();
@@ -75,11 +73,10 @@ public class DocMy extends Doc {
 			sql = "SELECT C_Receivable_Services_Acct FROM C_BP_Customer_Acct WHERE C_BPartner_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_BPartner_ID();
 		} else if (AcctType == ACCTTYPE_V_Prepayment) {
-			// sql =
-			// "SELECT V_Prepayment_Acct FROM C_BP_Vendor_Acct WHERE C_BPartner_ID=? AND C_AcctSchema_ID=?";
-			// para_1 = getC_BPartner_ID();
-			sql = "select e_expense_acct from adempiere.c_bp_employee_acct t where t.c_bpartner_id=? and t.C_AcctSchema_ID=?";
+			sql = "SELECT V_Prepayment_Acct FROM C_BP_Vendor_Acct WHERE C_BPartner_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_BPartner_ID();
+			//sql = "select e_expense_acct from adempiere.c_bp_employee_acct t where t.c_bpartner_id=? and t.C_AcctSchema_ID=?";
+			//para_1 = getC_BPartner_ID();
 		} else if (AcctType == ACCTTYPE_C_Prepayment) {
 			sql = "SELECT C_Prepayment_Acct FROM C_BP_Customer_Acct WHERE C_BPartner_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_BPartner_ID();
@@ -126,12 +123,14 @@ public class DocMy extends Doc {
 
 		/** Account Type - Cash */
 		else if (AcctType == ACCTTYPE_CashAsset) {
+			//TODO: Advance
 			sql = "SELECT CB_Asset_Acct FROM C_CashBook_Acct WHERE C_CashBook_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_CashBook_ID();
 		} else if (AcctType == ACCTTYPE_CashTransfer) {
 			sql = "SELECT CB_CashTransfer_Acct FROM C_CashBook_Acct WHERE C_CashBook_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_CashBook_ID();
 		} else if (AcctType == ACCTTYPE_CashExpense) {
+			//TODO: Advance
 			// sql =
 			// "SELECT CB_Expense_Acct FROM C_CashBook_Acct WHERE C_CashBook_ID=? AND C_AcctSchema_ID=?";
 			// para_1 = getC_CashBook_ID();
@@ -181,7 +180,7 @@ public class DocMy extends Doc {
 			sql = "SELECT CommitmentOffsetSales_Acct FROM C_AcctSchema_GL WHERE C_AcctSchema_ID=?";
 			para_1 = -1;
 		}
-		/** Advance type */
+		/** Advance type (Vladimir Sokolov)*/
 		else if(AcctType == ACCTTYPE_CashAssetAdvance){
 			sql = "SELECT CB_Asset_Acct FROM C_CashBook_Acct WHERE C_CashBook_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_CashBook_ID();
@@ -194,7 +193,7 @@ public class DocMy extends Doc {
 				sql = "select e_expense_acct from adempiere.c_bp_employee_acct t where t.c_bpartner_id=? and t.C_AcctSchema_ID=?";
 				para_1 = getC_BPartner_ID();
 			}
-		}
+		}// Advance type
 
 		else {
 			log.severe("Not found AcctType=" + AcctType);

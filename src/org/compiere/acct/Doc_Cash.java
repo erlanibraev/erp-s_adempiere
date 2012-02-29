@@ -246,6 +246,7 @@ public class Doc_Cash extends DocMy
 						getAccount(Doc.ACCTTYPE_CashAsset, as),
 						line.getC_Currency_ID(), line.getAmount());
 			}
+			// CashType Advance  (Vladimir Sokolov)
 			else if (CashType.equals(CASHTYPE_ADVANCE))
 			{   //  amount is pos/neg
 				//  CashAsset       DR      dr      --   Invoice is in Invoice Currency !
