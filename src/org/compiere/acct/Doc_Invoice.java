@@ -91,46 +91,6 @@ public class Doc_Invoice extends DocMy
 		p_lines = loadLines(invoice);
 		log.fine("Lines=" + p_lines.length + ", Taxes=" + m_taxes.length);
 		
-		// calculate the overpayment underpayment
-		MCashLine cl = null;
-		PreparedStatement pstmt = null;
-		// Advance Payment - C_DocType_ID = 1000046
-		if(invoice.getC_CashLine_ID() != 0 && invoice.getC_DocTypeTarget().getC_DocType_ID() == 1000046){
-			cl = new  MCashLine(getCtx(), invoice.getC_CashLine_ID(), invoice.get_TrxName());
-			BigDecimal Amt = cl.getOverUnderAmt();
-			MInvoiceLine cll = new MInvoiceLine(invoice.getCtx(), p_lines[0].get_ID(), invoice.get_TrxName());
-			StringBuilder upd = new StringBuilder("update ");
-			upd.append(cl.get_TableName()).append(" set OverUnderAmt=?");
-			upd.append(" where c_cashline_id=?");
-			//
-			pstmt = DB.prepareStatement(upd.toString(), null);
-			try {
-				pstmt.setObject(1, Amt.subtract(cll.getPriceEntered()));
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-				log.log(Level.SEVERE, "1) upd OverUnderAmt "+ e1.getMessage());
-			}
-			try {
-				pstmt.setInt(2, cl.get_ID());
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-				log.log(Level.SEVERE, "2) upd OverUnderAmt "+ e1.getMessage());
-			}
-			try{
-				pstmt.execute();
-			}catch(SQLException e){
-				log.log(Level.SEVERE, upd.toString(), e);
-			}finally{
-				try {
-					pstmt.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-					log.log(Level.SEVERE, "3) close upd OverUnderAmt "+ e.getMessage());
-				}
-				pstmt = null;
-			}
-		}
-		
 		return null;
 	}   //  loadDocumentDetails
 

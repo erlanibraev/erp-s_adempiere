@@ -927,17 +927,6 @@ public class MInvoiceLine extends X_C_InvoiceLine
 		if (!success)
 			return success;
 		
-		// calculate the overpayment underpayment
-		MCashLine cl = null;
-		// Advance Payment - C_DocType_ID = 1000046
-		if(getParent().getC_CashLine_ID() != 0 && getParent().getC_DocTypeTarget().getC_DocType_ID() == 1000046){
-			cl = new  MCashLine(getCtx(), getParent().getC_CashLine_ID(), get_TrxName());
-			BigDecimal Amt = cl.getAmount();
-			//cl.setOverUnderAmt(Amt.subtract(getPriceEntered()));
-			//cl.saveUpdate();
-		}
-		
-			
 		if (!newRecord && is_ValueChanged("C_Tax_ID"))
 		{
 			//	Recalculate Tax for old Tax
