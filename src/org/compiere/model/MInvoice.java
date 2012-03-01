@@ -956,6 +956,7 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			DB.executeUpdate(updInvoice, get_TrxName());
 			log.info("Update c_invoice_id of c_cashline");
 		}
+		
 		return true;
 	}	//	beforeSave
 
@@ -1885,14 +1886,13 @@ public class MInvoice extends X_C_Invoice implements DocAction
 			if("A".equals(line.getCashType())){
 			
 				/**	Contained Doc Lines	*/
-				MInvoiceLine[]	plines;		
-				plines = getLines();
+				MInvoiceLine[]	plines = getLines();		
 			
 				// calculate the overpayment underpayment
 				MCashLine cl = new  MCashLine(getCtx(), getC_CashLine_ID(), get_TrxName());
 				BigDecimal Amt_ = cl.getOverUnderAmt();
 				MInvoiceLine cll = new MInvoiceLine(getCtx(), plines[0].get_ID(), get_TrxName());
-				cl.setOverUnderAmt(Amt_.subtract(cll.getPriceEntered()));
+				cl.setOverUnderAmt(Amt_.add(cll.getPriceEntered()));
 				cl.saveUpdate();			
 	
 				// Check if the cash is completed - teo_sarca BF [ 1894524 ]

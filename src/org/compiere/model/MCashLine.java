@@ -371,6 +371,9 @@ public class MCashLine extends X_C_CashLine
 		}
 		
 		// OverUndcerAmt
+		BigDecimal Amt_ = getAmount();
+		if(Math.signum(Amt_.doubleValue()) == 1.)
+			setAmount(Amt_.negate());
 		setOverUnderAmt(getAmount());
 		
 		return true;

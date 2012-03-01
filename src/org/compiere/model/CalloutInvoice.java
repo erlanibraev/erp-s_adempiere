@@ -511,7 +511,6 @@ public class CalloutInvoice extends CalloutEngine
 		QtyEntered = (BigDecimal)mTab.getValue("QtyEntered");
 		QtyInvoiced = (BigDecimal)mTab.getValue("QtyInvoiced");
 		log.fine("QtyEntered=" + QtyEntered + ", Invoiced=" + QtyInvoiced + ", UOM=" + C_UOM_To_ID);
-		//
 		PriceEntered = (BigDecimal)mTab.getValue("PriceEntered");
 		PriceActual = (BigDecimal)mTab.getValue("PriceActual");
 	//	Discount = (BigDecimal)mTab.getValue("Discount");
@@ -532,8 +531,20 @@ public class CalloutInvoice extends CalloutEngine
 			}
 			else if (mField.getColumnName().equals("PriceEntered"))
 			{
-				PriceActual = (BigDecimal) value;
-				mTab.setValue("PriceActual", value);
+				// Advance - set the desired character (Vladimir Sokolov)
+				long docType = (Integer) mTab.getParentTab().getMTable().getField("C_DocTypeTarget_ID").getValue();
+				if(docType == 1000046){
+					BigDecimal dd = (BigDecimal) value;
+					if(Math.signum(PriceEntered.doubleValue()) == -1.){
+						PriceActual = dd.negate();
+						mTab.setValue("PriceEntered", dd.negate());
+						mTab.setValue("PriceActual", dd.negate());
+					}else{
+						mTab.setValue("PriceActual", value);
+					}// Advance
+				}else{
+					mTab.setValue("PriceActual", value);
+				}
 			}
 		}
 		//	Product Qty changed - recalc price
