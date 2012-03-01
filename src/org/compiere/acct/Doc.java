@@ -194,6 +194,9 @@ public abstract class Doc
 	public static final String 	STATUS_Posted           = "Y";
 	/**	Document Status         */
 	public static final String 	STATUS_Error            = "E";
+	
+	/** CashType */
+	public static final String CashTypeAdvance = "A";
 
 	
 	/**
