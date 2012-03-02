@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.BPartnerNoAddressException;
 import org.adempiere.exceptions.DBException;
+import org.compiere.acct.Doc;
 import org.compiere.acct.DocLine;
 import org.compiere.print.ReportEngine;
 import org.compiere.process.DocAction;
@@ -1294,6 +1295,14 @@ public class MInvoice extends X_C_Invoice implements DocAction
 	public boolean processIt (String processAction)
 	{
 		m_processMsg = null;
+		// cancellation overpayment underpayment (Vladimir Sokolov)
+		if(getC_CashLine_ID() != 0 && DOCSTATUS_Voided.equals(getDocAction())){
+			MCashLine cl = new  MCashLine(getCtx(), getC_CashLine_ID(), get_TrxName());
+			if(Doc.CashTypeAdvance.equals(cl.getCashType())){
+				cl.setOverUnderAmt(cl.getAmount().add(getTotalLines()));
+				cl.saveUpdate();
+			}
+		}
 		DocumentEngine engine = new DocumentEngine (this, getDocStatus());
 		return engine.processIt (processAction, getDocAction());
 	}	//	process
@@ -1878,12 +1887,12 @@ public class MInvoice extends X_C_Invoice implements DocAction
 		}	//	project
 
 		//// BEGIN - Vladimir Sokolov
-		MCashLine line = null;
+		MCashLine line_ = null;
 		if(getC_CashLine_ID() != 0)
-			line = new MCashLine(getCtx(), getC_CashLine_ID(), null);
+			line_ = new MCashLine(getCtx(), getC_CashLine_ID(), null);
 		
-		if(line != null){
-			if("A".equals(line.getCashType())){
+		if(line_ != null){
+			if(Doc.CashTypeAdvance.equals(line_.getCashType())){
 			
 				/**	Contained Doc Lines	*/
 				MInvoiceLine[]	plines = getLines();		
@@ -1896,21 +1905,21 @@ public class MInvoice extends X_C_Invoice implements DocAction
 				cl.saveUpdate();			
 	
 				// Check if the cash is completed - teo_sarca BF [ 1894524 ]
-				MCash cash_ = line.getParent();
+				MCash cash_ = line_.getParent();
 				if (   !MCash.DOCSTATUS_Completed.equals(cash_.getDocStatus())
 						&& !MCash.DOCSTATUS_Closed.equals(cash_.getDocStatus())
 						&& !MCash.DOCSTATUS_Reversed.equals(cash_.getDocStatus())
 						&& !MCash.DOCSTATUS_Voided.equals(cash_.getDocStatus())
 					)
 				{
-					m_processMsg = "@Line@ "+line.getLine()+": @CashCreateDocNotCompleted@";
+					m_processMsg = "@Line@ "+line_.getLine()+": @CashCreateDocNotCompleted@";
 							return DocAction.STATUS_Invalid;
 				}
 				// add AllocationHdr 
-				String name = Msg.translate(getCtx(), "C_Cash_ID") + ": " + line.getParent().getName()
-								+ " - " + Msg.translate(getCtx(), "Line") + " " + line.getLine();
+				String name = Msg.translate(getCtx(), "C_Cash_ID") + ": " + line_.getParent().getName()
+								+ " - " + Msg.translate(getCtx(), "Line") + " " + line_.getLine();
 				MAllocationHdr hdr = new MAllocationHdr(getCtx(), false, 
-						getDateAcct(), line.getC_Currency_ID(),
+						getDateAcct(), line_.getC_Currency_ID(),
 						name, get_TrxName());
 				hdr.setAD_Org_ID(getAD_Org_ID());
 				if (!hdr.save())
@@ -1919,10 +1928,10 @@ public class MInvoice extends X_C_Invoice implements DocAction
 					return DocAction.STATUS_Invalid;
 				}
 				//	Allocation Line
-				MAllocationLine aLine = new MAllocationLine (hdr, line.getAmount(),
-					line.getDiscountAmt(), line.getWriteOffAmt(), Env.ZERO);
-				aLine.setC_Invoice_ID(line.getC_Invoice_ID());
-				aLine.setC_CashLine_ID(line.getC_CashLine_ID());
+				MAllocationLine aLine = new MAllocationLine (hdr, line_.getAmount(),
+						line_.getDiscountAmt(), line_.getWriteOffAmt(), Env.ZERO);
+				aLine.setC_Invoice_ID(line_.getC_Invoice_ID());
+				aLine.setC_CashLine_ID(line_.getC_CashLine_ID());
 				if (!aLine.save())
 				{
 					m_processMsg = CLogger.retrieveErrorString("Could not create Allocation Line");
