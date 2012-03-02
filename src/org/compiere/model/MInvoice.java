@@ -1295,11 +1295,12 @@ public class MInvoice extends X_C_Invoice implements DocAction
 	public boolean processIt (String processAction)
 	{
 		m_processMsg = null;
-		// cancellation overpayment underpayment (Vladimir Sokolov)
+		// cancellation overpayment underpayment of advance statement (Vladimir Sokolov)
 		if(getC_CashLine_ID() != 0 && DOCSTATUS_Voided.equals(getDocAction())){
 			MCashLine cl = new  MCashLine(getCtx(), getC_CashLine_ID(), get_TrxName());
 			if(Doc.CashTypeAdvance.equals(cl.getCashType())){
-				cl.setOverUnderAmt(cl.getAmount().add(getTotalLines()));
+				BigDecimal ovrUnd = cl.getOverUnderAmt();
+				cl.setOverUnderAmt(ovrUnd.add(getTotalLines().negate()));
 				cl.saveUpdate();
 			}
 		}
