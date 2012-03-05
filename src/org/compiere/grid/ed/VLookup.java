@@ -46,6 +46,7 @@ import javax.swing.KeyStroke;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 
+import org.compiere.acct.Doc;
 import org.compiere.apps.ADialog;
 import org.compiere.apps.AEnv;
 import org.compiere.apps.AWindow;
@@ -1425,8 +1426,15 @@ public class VLookup extends JComponent
 
 			zoomQuery.setRecordCount(1);	//	guess
 		}
-
-		int	AD_Window_ID = m_lookup.getZoom(zoomQuery);
+		// TODO: Need to remove the binding to ID (V.Sokolov)
+		String winAdv = Env.getContext(Env.getCtx(), m_lookup.getWindowNo(), "CashType");
+		int	AD_Window_ID;
+		if(Doc.CashTypeAdvance.equals(winAdv)){
+			AD_Window_ID = m_lookup.getZoom(zoomQuery);
+		}
+		else{// (V.Sokolov)
+			AD_Window_ID = m_lookup.getZoom(zoomQuery);
+		}
 		//
 		log.info(m_columnName + " - AD_Window_ID=" + AD_Window_ID
 			+ " - Query=" + zoomQuery + " - Value=" + value);
