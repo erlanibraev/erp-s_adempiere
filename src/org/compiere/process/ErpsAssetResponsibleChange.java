@@ -4,14 +4,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.logging.Level;
 
+import org.compiere.model.MerpsrecTransDocLine;
+import org.compiere.model.MerpsreceptTransmissionDoc;
 import org.compiere.util.DB;
 import org.erps.ErpsEncoder;
 
 public class ErpsAssetResponsibleChange extends SvrProcess {
 
 	private int	p_erp_TransDoc_ID;	
-	private int	p_erp_C_BPartner_ID;	
-	private Integer	p_erp_A_Asset_ID;	
+	private int	p_erp_C_BPartner_ID = 0;	
+	private Integer	p_erp_A_Asset_ID = 0;	
 	private String finalMsg;
 	
 	private ErpsEncoder encoder = new ErpsEncoder();	
@@ -33,6 +35,10 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 
 	@Override
 	protected String doIt() throws Exception {
+		
+		MerpsreceptTransmissionDoc mm = new MerpsreceptTransmissionDoc(getCtx(), p_erp_TransDoc_ID, get_TrxName());
+		MerpsrecTransDocLine[] lines = mm.getLines();
+		
 		String sql_main_rec = "SELECT * "
 				+ "FROM erps_recepttransmissiondoc "
 				+ "WHERE erps_recepttransmissiondoc_id =" + p_erp_TransDoc_ID;
