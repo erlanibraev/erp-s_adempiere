@@ -29,7 +29,7 @@ public class X_erps_recTransDocLine extends PO implements I_erps_recTransDocLine
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120306L;
+	private static final long serialVersionUID = 20120307L;
 
     /** Standard Constructor */
     public X_erps_recTransDocLine (Properties ctx, int erps_recTransDocLine_ID, String trxName)

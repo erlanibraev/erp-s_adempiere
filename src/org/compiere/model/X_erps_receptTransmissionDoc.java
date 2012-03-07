@@ -30,7 +30,7 @@ public class X_erps_receptTransmissionDoc extends PO implements I_erps_receptTra
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120306L;
+	private static final long serialVersionUID = 20120307L;
 
     /** Standard Constructor */
     public X_erps_receptTransmissionDoc (Properties ctx, int erps_receptTransmissionDoc_ID, String trxName)
