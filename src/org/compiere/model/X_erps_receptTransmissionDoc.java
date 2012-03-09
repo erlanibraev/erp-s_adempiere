@@ -290,4 +290,12 @@ public class X_erps_receptTransmissionDoc extends PO implements I_erps_receptTra
 	{
 		return (String)get_Value(COLUMNNAME_Value);
 	}
+	
+	/**
+	 * 	Update Record directly
+	 * 	@return true if updated
+	 */
+	public boolean saveUpdate() {
+		return super.saveUpdate();
+	}
 }

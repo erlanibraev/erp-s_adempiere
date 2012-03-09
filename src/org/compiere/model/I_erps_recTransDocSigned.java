@@ -21,7 +21,7 @@ import java.sql.Timestamp;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for erps_recTransDocSigned
- *  @author Adempiere (generated) 
+ *  @author V.Sokolov (generated) 
  *  @version Release 3.7.0LTS
  */
 public interface I_erps_recTransDocSigned 

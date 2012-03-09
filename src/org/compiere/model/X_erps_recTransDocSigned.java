@@ -21,7 +21,7 @@ import java.sql.ResultSet;
 import java.util.Properties;
 
 /** Generated Model for erps_recTransDocSigned
- *  @author Adempiere (generated) 
+ *  @author V.Sokolov (generated) 
  *  @version Release 3.7.0LTS - $Id$ */
 public class X_erps_recTransDocSigned extends PO implements I_erps_recTransDocSigned, I_Persistent 
 {
@@ -183,5 +183,13 @@ public class X_erps_recTransDocSigned extends PO implements I_erps_recTransDocSi
 			return "Y".equals(oo);
 		}
 		return false;
+	}
+	
+	/**
+	 * 	Update Record directly
+	 * 	@return true if updated
+	 */
+	public boolean saveUpdate() {
+		return super.saveUpdate();
 	}
 }

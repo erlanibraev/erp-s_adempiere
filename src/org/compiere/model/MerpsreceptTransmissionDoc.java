@@ -17,6 +17,8 @@ public class MerpsreceptTransmissionDoc extends X_erps_receptTransmissionDoc {
 	
 	/**	ReceptTransmissionDoc Lines	*/
 	private MerpsrecTransDocLine[] m_lines;
+	/** ReceptTransmissionDoc Signed */
+	private MerpsrecTransDocSigned[] m_signed;
 	
 	/**	Static Logger	*/
 	private static CLogger	s_log	= CLogger.getCLogger (MerpsreceptTransmissionDoc.class);
@@ -85,6 +87,44 @@ public class MerpsreceptTransmissionDoc extends X_erps_receptTransmissionDoc {
 	{
 		return getLines(false);
 	}	//	getLines
+	
+	/**
+	 * 	Get ReceptTransmissionDoc Signed of ReceptTransmissionDoc
+	 * 	@param whereClause starting with AND
+	 * 	@return signed
+	 */
+	private MerpsrecTransDocSigned[] getSigned (String whereClause)
+	{
+		String whereClauseFinal = "erps_receptTransmissionDoc_ID=? ";
+		if (whereClause != null)
+			whereClauseFinal += whereClause;
+		List<MerpsrecTransDocSigned> list = new Query(getCtx(), I_erps_recTransDocSigned.Table_Name, whereClauseFinal, get_TrxName())
+										.setParameters(geterps_receptTransmissionDoc_ID())
+										.list();
+		return list.toArray(new MerpsrecTransDocSigned[list.size()]);
+	}	//	getSigned
+	
+	/**
+	 * 	Get ReceptTransmissionDoc Signed
+	 * 	@param requery
+	 * 	@return signed
+	 */
+	public MerpsrecTransDocSigned[] getSigned (boolean requery)
+	{
+		if (m_signed == null || m_signed.length == 0 || requery)
+			m_signed = getSigned(null);
+		set_TrxName(m_signed, get_TrxName());
+		return m_signed;
+	}	//	getSigned
+	
+	/**
+	 * 	Get Lines of ReceptTransmissionDoc
+	 * 	@return signed
+	 */
+	public MerpsrecTransDocSigned[] getSigned()
+	{
+		return getSigned(false);
+	}	//	getSigned
 	
 	protected boolean beforeSave(boolean newRecord) {
 		// check for a match fields

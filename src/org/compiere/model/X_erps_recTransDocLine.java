@@ -182,4 +182,12 @@ public class X_erps_recTransDocLine extends PO implements I_erps_recTransDocLine
 		}
 		return false;
 	}
+	
+	/**
+	 * 	Update Record directly
+	 * 	@return true if updated
+	 */
+	public boolean saveUpdate() {
+		return super.saveUpdate();
+	}
 }

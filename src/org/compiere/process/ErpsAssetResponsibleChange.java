@@ -3,6 +3,7 @@ package org.compiere.process;
 import java.util.logging.Level;
 import org.compiere.model.MAsset;
 import org.compiere.model.MerpsrecTransDocLine;
+import org.compiere.model.MerpsrecTransDocSigned;
 import org.compiere.model.MerpsreceptTransmissionDoc;
 import org.compiere.util.CLogger;
 import org.erps.ErpsEncoder;
@@ -11,6 +12,7 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 
 	private String finalMsg = "OK";
 	private MerpsrecTransDocLine[] lines;
+	private MerpsrecTransDocSigned[] signed;
 	private MerpsreceptTransmissionDoc TransmissionDoc = null;
 	
 	/**	Static Logger	*/
@@ -30,6 +32,7 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 		//
 		TransmissionDoc = new MerpsreceptTransmissionDoc(getCtx(), getRecord_ID(), get_TrxName());
 		lines = TransmissionDoc.getLines();
+		signed = TransmissionDoc.getSigned();
 
 	}
 
@@ -41,26 +44,28 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 			return encoder.encodeUTF8("Error. TransmissionDoc is null");
 		}
 		
-		if(lines.length == 0){
-			
-			return encoder.encodeUTF8("TransmissionDocLine is null");
+		if(lines.length == 0 || signed.length == 0){
+			s_log.log(Level.SEVERE, "TransmissionDocLine or TransmissionDocSigned is null");
+			return encoder.encodeUTF8("TransmissionDocLine or TransmissionDocSigned is null");
 		}
 		
 		//  Lines
-		for (int i = 0; i < lines.length; i++)
-		{
-			MerpsrecTransDocLine docLine = lines[i];
-			MAsset as = new MAsset(getCtx(), docLine.getA_Asset_ID());
+		for(MerpsrecTransDocLine dl: lines){
+			MAsset as = new MAsset(getCtx(), dl.getA_Asset_ID());
 			as.setC_BPartnerSR_ID(TransmissionDoc.geterps_toResponsible());
-			docLine.setProcessed(true);
-			docLine.saveEx();
 			as.saveEx();
+			dl.setProcessed(true);
+			dl.saveUpdate();
 		}
 		
-		//Signed
+		//Signed		
+		for(MerpsrecTransDocSigned s: signed){
+			s.setProcessed(true);
+			s.saveUpdate();
+		}
 		
 		TransmissionDoc.setProcessed(true);
-		TransmissionDoc.saveEx();
+		TransmissionDoc.saveUpdate();
 		
 		/*String sql_main_rec = "SELECT * "
 				+ "FROM erps_recepttransmissiondoc "
