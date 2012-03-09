@@ -1,4 +1,4 @@
-package extend.src.compiere;
+package extend.org.compiere;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -32,11 +32,12 @@ public class CalloutReceptTransmissionDoc extends CalloutEngine {
 	public String setDescription(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value){
 		
 		Integer assetId = (Integer) value;
-		if(assetId == 0)
-			msg = "Not found the main means of";
+		if(assetId == null)
+			return msg = "Not found the main means of";
 		
 		MAsset as = new MAsset(ctx, assetId, null);
-			mTab.setValue("Description", "N "+ as.getValue()+ ",  "+ as.getDescription());
+		mTab.setValue("Description", as.getValue()+ ",   "+ as.getDescription());
+		
 		return msg;
 	}
 
