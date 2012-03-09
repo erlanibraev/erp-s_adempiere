@@ -86,7 +86,7 @@ public class InfoAsset extends Info
 	/** From Clause             */
 	private static String s_assetFROM = "A_ASSET a"
 		+ " LEFT OUTER JOIN M_Product p ON (a.M_Product_ID=p.M_Product_ID)"
-		+ " LEFT OUTER JOIN C_BPartner bp ON (a.C_BPartner_ID=bp.C_BPartner_ID)"
+		+ " LEFT OUTER JOIN C_BPartner bp ON (a.C_BPartnerSR_ID=bp.C_BPartner_ID)"
 		+ " LEFT OUTER JOIN AD_User u ON (a.AD_User_ID=u.AD_User_ID)";
 
 	/**  Array of Column Info    */
@@ -95,7 +95,7 @@ public class InfoAsset extends Info
 		new Info_Column(Msg.translate(Env.getCtx(), "Value"), "a.Value", String.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "Name"), "a.Name", String.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "M_Product_ID"), "p.Name", String.class),
-		new Info_Column(Msg.translate(Env.getCtx(), "C_BPartner_ID"), "bp.Name",  String.class),
+		new Info_Column(Msg.translate(Env.getCtx(), "Responsible"), "bp.Name",  String.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "AD_User_ID"), "u.Name", String.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "AssetServiceDate"), "a.AssetServiceDate", Timestamp.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "GuaranteeDate"), "a.GuaranteeDate", Timestamp.class),
@@ -108,7 +108,7 @@ public class InfoAsset extends Info
 	private CLabel labelName = new CLabel();
 	private CTextField fieldName = new CTextField(10);
 	//
-	private CLabel lBPartner_ID = new CLabel(Msg.translate(Env.getCtx(), "BPartner"));
+	private CLabel lBPartner_ID = new CLabel(Msg.translate(Env.getCtx(), "Responsible"));
 	private VLookup fBPartner_ID;
 	private CLabel lProduct_ID = new CLabel(Msg.translate(Env.getCtx(), "Product"));
 	private VLookup fProduct_ID;
@@ -199,7 +199,7 @@ public class InfoAsset extends Info
 		//	C_BPartner_ID
 		Integer C_BPartner_ID = (Integer)fBPartner_ID.getValue();
 		if (C_BPartner_ID != null)
-			sql.append (" AND a.C_BPartner_ID=").append(C_BPartner_ID);
+			sql.append (" AND a.C_BPartnerSR_ID=").append(C_BPartner_ID);
 		//	M_Product_ID
 		Integer M_Product_ID = (Integer)fProduct_ID.getValue();
 		if (M_Product_ID != null)

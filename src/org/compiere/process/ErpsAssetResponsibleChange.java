@@ -1,22 +1,20 @@
 package org.compiere.process;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.logging.Level;
-
-import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MAsset;
 import org.compiere.model.MerpsrecTransDocLine;
 import org.compiere.model.MerpsreceptTransmissionDoc;
-import org.compiere.util.DB;
+import org.compiere.util.CLogger;
 import org.erps.ErpsEncoder;
 
 public class ErpsAssetResponsibleChange extends SvrProcess {
 
-	private int	p_erp_TransDoc_ID;	
-	private int	p_erp_C_BPartner_ID = 0;	
-	private Integer	p_erp_A_Asset_ID = 0;	
-	private String finalMsg;
+	private String finalMsg = "OK";
 	private MerpsrecTransDocLine[] lines;
+	private MerpsreceptTransmissionDoc TransmissionDoc = null;
+	
+	/**	Static Logger	*/
+	private static CLogger	s_log	= CLogger.getCLogger (ErpsAssetResponsibleChange.class);
 	
 	private ErpsEncoder encoder = new ErpsEncoder();	
 	@Override
@@ -30,26 +28,41 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 		}
 		
 		//
-		p_erp_TransDoc_ID = getRecord_ID();
-		MerpsreceptTransmissionDoc mm = new MerpsreceptTransmissionDoc(getCtx(), p_erp_TransDoc_ID, get_TrxName());
-		lines = mm.getLines();
+		TransmissionDoc = new MerpsreceptTransmissionDoc(getCtx(), getRecord_ID(), get_TrxName());
+		lines = TransmissionDoc.getLines();
 
 	}
 
 	@Override
 	protected String doIt() throws Exception {
 		
-		if(lines.length == 0)
-			throw new AdempiereException(encoder.encodeUTF8("Отсутствуют строки акта..."));
+		if(TransmissionDoc == null){
+			s_log.log(Level.SEVERE, "TransmissionDoc is null ");
+			return encoder.encodeUTF8("Error. TransmissionDoc is null");
+		}
+		
+		if(lines.length == 0){
+			
+			return encoder.encodeUTF8("TransmissionDocLine is null");
+		}
 		
 		//  Lines
 		for (int i = 0; i < lines.length; i++)
 		{
 			MerpsrecTransDocLine docLine = lines[i];
-			
+			MAsset as = new MAsset(getCtx(), docLine.getA_Asset_ID());
+			as.setC_BPartnerSR_ID(TransmissionDoc.geterps_toResponsible());
+			docLine.setProcessed(true);
+			docLine.saveEx();
+			as.saveEx();
 		}
 		
-		String sql_main_rec = "SELECT * "
+		//Signed
+		
+		TransmissionDoc.setProcessed(true);
+		TransmissionDoc.saveEx();
+		
+		/*String sql_main_rec = "SELECT * "
 				+ "FROM erps_recepttransmissiondoc "
 				+ "WHERE erps_recepttransmissiondoc_id =" + p_erp_TransDoc_ID;
 			String sql_mainline_doc = "SELECT a_asset_id "
@@ -95,7 +108,7 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 			} finally {
 					DB.close(rs, pstmt);
 					rs = null; pstmt = null;
-			}	
+			}	*/
 			return finalMsg;
 	}
 

@@ -20,29 +20,31 @@ package org.compiere.model;
 import java.sql.ResultSet;
 import java.util.Properties;
 
-/** Generated Model for erps_recTransDocLine
+/** Generated Model for erps_recTransDocSigned
  *  @author Adempiere (generated) 
  *  @version Release 3.7.0LTS - $Id$ */
-public class X_erps_recTransDocLine extends PO implements I_erps_recTransDocLine, I_Persistent 
+public class X_erps_recTransDocSigned extends PO implements I_erps_recTransDocSigned, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120307L;
+	private static final long serialVersionUID = 20120309L;
 
     /** Standard Constructor */
-    public X_erps_recTransDocLine (Properties ctx, int erps_recTransDocLine_ID, String trxName)
+    public X_erps_recTransDocSigned (Properties ctx, int erps_recTransDocSigned_ID, String trxName)
     {
-      super (ctx, erps_recTransDocLine_ID, trxName);
-      /** if (erps_recTransDocLine_ID == 0)
+      super (ctx, erps_recTransDocSigned_ID, trxName);
+      /** if (erps_recTransDocSigned_ID == 0)
         {
-			seterps_recTransDocLine_ID (0);
+			setC_BPartner_ID (0);
+			seterps_receptTransmissionDoc_ID (0);
+			seterps_recTransDocSigned_ID (0);
         } */
     }
 
     /** Load Constructor */
-    public X_erps_recTransDocLine (Properties ctx, ResultSet rs, String trxName)
+    public X_erps_recTransDocSigned (Properties ctx, ResultSet rs, String trxName)
     {
       super (ctx, rs, trxName);
     }
@@ -64,34 +66,34 @@ public class X_erps_recTransDocLine extends PO implements I_erps_recTransDocLine
 
     public String toString()
     {
-      StringBuffer sb = new StringBuffer ("X_erps_recTransDocLine[")
+      StringBuffer sb = new StringBuffer ("X_erps_recTransDocSigned[")
         .append(get_ID()).append("]");
       return sb.toString();
     }
 
-	public org.compiere.model.I_A_Asset getA_Asset() throws RuntimeException
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException
     {
-		return (org.compiere.model.I_A_Asset)MTable.get(getCtx(), org.compiere.model.I_A_Asset.Table_Name)
-			.getPO(getA_Asset_ID(), get_TrxName());	}
+		return (org.compiere.model.I_C_BPartner)MTable.get(getCtx(), org.compiere.model.I_C_BPartner.Table_Name)
+			.getPO(getC_BPartner_ID(), get_TrxName());	}
 
-	/** Set Asset.
-		@param A_Asset_ID 
-		Asset used internally or by customers
+	/** Set Business Partner .
+		@param C_BPartner_ID 
+		Identifies a Business Partner
 	  */
-	public void setA_Asset_ID (int A_Asset_ID)
+	public void setC_BPartner_ID (int C_BPartner_ID)
 	{
-		if (A_Asset_ID < 1) 
-			set_Value (COLUMNNAME_A_Asset_ID, null);
+		if (C_BPartner_ID < 1) 
+			set_Value (COLUMNNAME_C_BPartner_ID, null);
 		else 
-			set_Value (COLUMNNAME_A_Asset_ID, Integer.valueOf(A_Asset_ID));
+			set_Value (COLUMNNAME_C_BPartner_ID, Integer.valueOf(C_BPartner_ID));
 	}
 
-	/** Get Asset.
-		@return Asset used internally or by customers
+	/** Get Business Partner .
+		@return Identifies a Business Partner
 	  */
-	public int getA_Asset_ID () 
+	public int getC_BPartner_ID () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_A_Asset_ID);
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_BPartner_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
@@ -139,35 +141,35 @@ public class X_erps_recTransDocLine extends PO implements I_erps_recTransDocLine
 		return ii.intValue();
 	}
 
-	/** Set erps_recTransDocLine.
-		@param erps_recTransDocLine_ID erps_recTransDocLine	  */
-	public void seterps_recTransDocLine_ID (int erps_recTransDocLine_ID)
+	/** Set erps_recTransDocSigned.
+		@param erps_recTransDocSigned_ID erps_recTransDocSigned	  */
+	public void seterps_recTransDocSigned_ID (int erps_recTransDocSigned_ID)
 	{
-		if (erps_recTransDocLine_ID < 1) 
-			set_ValueNoCheck (COLUMNNAME_erps_recTransDocLine_ID, null);
+		if (erps_recTransDocSigned_ID < 1) 
+			set_ValueNoCheck (COLUMNNAME_erps_recTransDocSigned_ID, null);
 		else 
-			set_ValueNoCheck (COLUMNNAME_erps_recTransDocLine_ID, Integer.valueOf(erps_recTransDocLine_ID));
+			set_ValueNoCheck (COLUMNNAME_erps_recTransDocSigned_ID, Integer.valueOf(erps_recTransDocSigned_ID));
 	}
 
-	/** Get erps_recTransDocLine.
-		@return erps_recTransDocLine	  */
-	public int geterps_recTransDocLine_ID () 
+	/** Get erps_recTransDocSigned.
+		@return erps_recTransDocSigned	  */
+	public int geterps_recTransDocSigned_ID () 
 	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_erps_recTransDocLine_ID);
+		Integer ii = (Integer)get_Value(COLUMNNAME_erps_recTransDocSigned_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
 	}
-	
+
 	/** Set Processed.
-	@param Processed 
-	The document has been processed
-	 */
+		@param Processed 
+		The document has been processed
+	  */
 	public void setProcessed (boolean Processed)
 	{
 		set_Value (COLUMNNAME_Processed, Boolean.valueOf(Processed));
 	}
-	
+
 	/** Get Processed.
 		@return The document has been processed
 	  */

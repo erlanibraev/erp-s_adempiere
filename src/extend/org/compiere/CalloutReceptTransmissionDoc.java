@@ -36,7 +36,7 @@ public class CalloutReceptTransmissionDoc extends CalloutEngine {
 			return msg = "Not found the main means of";
 		
 		MAsset as = new MAsset(ctx, assetId, null);
-		mTab.setValue("Description", as.getValue()+ ",   "+ as.getDescription());
+		mTab.setValue("Description", as.getValue()+ ",   "+ as.getName());
 		
 		return msg;
 	}

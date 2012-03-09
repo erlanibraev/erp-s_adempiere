@@ -10,6 +10,7 @@ Thumbs.db
 test.properties
 
 .settings/org.eclipse.core.resources.prefs
+buildCustomization.properties
 syntax: regexp
 
 ^zkwebui/WEB-INF/classes$

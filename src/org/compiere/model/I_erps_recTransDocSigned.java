@@ -20,17 +20,17 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Interface for erps_recTransDocLine
+/** Generated Interface for erps_recTransDocSigned
  *  @author Adempiere (generated) 
  *  @version Release 3.7.0LTS
  */
-public interface I_erps_recTransDocLine 
+public interface I_erps_recTransDocSigned 
 {
 
-    /** TableName=erps_recTransDocLine */
-    public static final String Table_Name = "erps_recTransDocLine";
+    /** TableName=erps_recTransDocSigned */
+    public static final String Table_Name = "erps_recTransDocSigned";
 
-    /** AD_Table_ID=1000027 */
+    /** AD_Table_ID=1000043 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -40,21 +40,6 @@ public interface I_erps_recTransDocLine
     BigDecimal accessLevel = BigDecimal.valueOf(3);
 
     /** Load Meta Data */
-
-    /** Column name A_Asset_ID */
-    public static final String COLUMNNAME_A_Asset_ID = "A_Asset_ID";
-
-	/** Set Asset.
-	  * Asset used internally or by customers
-	  */
-	public void setA_Asset_ID (int A_Asset_ID);
-
-	/** Get Asset.
-	  * Asset used internally or by customers
-	  */
-	public int getA_Asset_ID();
-
-	public org.compiere.model.I_A_Asset getA_Asset() throws RuntimeException;
 
     /** Column name AD_Client_ID */
     public static final String COLUMNNAME_AD_Client_ID = "AD_Client_ID";
@@ -76,6 +61,21 @@ public interface I_erps_recTransDocLine
 	  * Organizational entity within client
 	  */
 	public int getAD_Org_ID();
+
+    /** Column name C_BPartner_ID */
+    public static final String COLUMNNAME_C_BPartner_ID = "C_BPartner_ID";
+
+	/** Set Business Partner .
+	  * Identifies a Business Partner
+	  */
+	public void setC_BPartner_ID (int C_BPartner_ID);
+
+	/** Get Business Partner .
+	  * Identifies a Business Partner
+	  */
+	public int getC_BPartner_ID();
+
+	public org.compiere.model.I_C_BPartner getC_BPartner() throws RuntimeException;
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -117,14 +117,14 @@ public interface I_erps_recTransDocLine
 
 	public I_erps_receptTransmissionDoc geterps_receptTransmissionDoc() throws RuntimeException;
 
-    /** Column name erps_recTransDocLine_ID */
-    public static final String COLUMNNAME_erps_recTransDocLine_ID = "erps_recTransDocLine_ID";
+    /** Column name erps_recTransDocSigned_ID */
+    public static final String COLUMNNAME_erps_recTransDocSigned_ID = "erps_recTransDocSigned_ID";
 
-	/** Set erps_recTransDocLine	  */
-	public void seterps_recTransDocLine_ID (int erps_recTransDocLine_ID);
+	/** Set erps_recTransDocSigned	  */
+	public void seterps_recTransDocSigned_ID (int erps_recTransDocSigned_ID);
 
-	/** Get erps_recTransDocLine	  */
-	public int geterps_recTransDocLine_ID();
+	/** Get erps_recTransDocSigned	  */
+	public int geterps_recTransDocSigned_ID();
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
@@ -138,8 +138,8 @@ public interface I_erps_recTransDocLine
 	  * The record is active in the system
 	  */
 	public boolean isActive();
-	
-	/** Column name Processed */
+
+    /** Column name Processed */
     public static final String COLUMNNAME_Processed = "Processed";
 
 	/** Set Processed.
