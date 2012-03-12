@@ -22,6 +22,8 @@ public class CalloutReceptTransmissionDoc extends CalloutEngine {
 	 * default Date (Sysdate)
 	 */
 	public void defaultValue(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value){
+		if(value != null)
+			return;
 		Date d = new Date();
 		mTab.setValue("DateDoc", new Timestamp(d.getTime()));
 	}
