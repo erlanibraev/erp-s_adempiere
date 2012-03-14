@@ -997,15 +997,15 @@ public class MRequest extends X_R_Request
 		if (newRecord)
 		{
 			// begin - V.Sokolov
-			long usrID = Env.getAD_User_ID(getCtx());
+			int usrID = Env.getAD_User_ID(getCtx());
 			if(usrID != 0 && getR_Request_ID() != 0){
-				//
-				String sql_ = "INSERT into r_requestupdates SELECT a.createdby,"+
-							"a.r_request_id, a.ad_client_id, a.ad_org_id,"+
-							"a.isactive, a.created,  "+usrID+" as AD_User_ID,"+
-							"a.updated, "+usrID+" as UpdatedBy, 'N' as IsSelfService"+
-						" FROM  adempiere.r_request as a WHERE a.r_request_id="+getR_Request_ID();
-				DB.executeUpdate(sql_, get_TrxName());
+				// sql injection
+				StringBuffer sql_ = new StringBuffer("INSERT into r_requestupdates SELECT a.createdby,");
+				sql_.append("a.r_request_id, a.ad_client_id, a.ad_org_id,");
+				sql_.append("a.isactive, a.created,  ? as AD_User_ID,");
+				sql_.append("a.updated, ? as UpdatedBy, 'N' as IsSelfService");
+				sql_.append(" FROM  adempiere.r_request as a WHERE a.r_request_id=?");
+				DB.executeUpdateEx(sql_.toString(), new Object[]{usrID, usrID, getR_Request_ID()}, get_TrxName());
 			}// end - V.Sokolov
 			
 			// Initial Mail

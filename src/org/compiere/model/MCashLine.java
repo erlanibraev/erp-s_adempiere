@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
 
+import org.compiere.acct.Doc;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
@@ -370,11 +371,13 @@ public class MCashLine extends X_C_CashLine
 			setLine (ii);
 		}
 		
-		// OverUndcerAmt
-		BigDecimal Amt_ = getAmount();
-		if(Math.signum(Amt_.doubleValue()) == 1.)
-			setAmount(Amt_.negate());
-		setOverUnderAmt(getAmount());
+		// OverUndcerAmt (V.Sokolov)
+		if(Doc.CashTypeAdvance.equals(getCashType())){
+			BigDecimal Amt_ = getAmount();
+			if(Math.signum(Amt_.doubleValue()) == 1.)
+				setAmount(Amt_.negate());
+			setOverUnderAmt(getAmount());
+		}
 		
 		return true;
 	}	//	beforeSave

@@ -157,13 +157,5 @@ public class CalloutCashJournal extends CalloutEngine
 
 		return "";
 	}	//	amounts
-	
-	public String overUnderAmt(Properties ctx, int WindowNo, GridTab mTab, GridField mField, Object value){
-		
-		String status = "";
-		
-		return status;
-		
-	}
 
 }	//	CalloutCashJournal
