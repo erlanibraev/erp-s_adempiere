@@ -17,7 +17,9 @@
 package org.compiere.acct;
 
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -115,9 +117,35 @@ public class Doc_Payment extends Doc
 			facts.add(fact);
 			return facts;
 		}
-
+		
+		int m_GL_Category_ID = 0; 
+		String sql_ = "SELECT GL_Category_ID FROM C_DocType WHERE C_DocType_ID=?";
+		PreparedStatement pstmt = null;
+		ResultSet rsDT = null;
+		try
+		{
+			pstmt = DB.prepareStatement(sql_, null);
+			pstmt.setInt(1, getC_DocType_ID());
+			rsDT = pstmt.executeQuery();
+			if (rsDT.next())
+			{
+				m_GL_Category_ID = rsDT.getInt(1);
+			}
+		}
+		catch (SQLException e)
+		{
+			log.log(Level.SEVERE, sql_, e);
+		}
+		finally
+		{
+			DB.close(rsDT, pstmt);
+			rsDT = null; 
+			pstmt = null;
+		}
+		
 		int AD_Org_ID = getBank_Org_ID();		//	Bank Account Org	
-		if (getDocumentType().equals(DOCTYPE_ARReceipt))
+		if (getDocumentType().equals(DOCTYPE_ARReceipt) 
+				&& m_GL_Category_ID != 0)
 		{
 			//	Asset
 			FactLine fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
@@ -149,7 +177,8 @@ public class Doc_Payment extends Doc
 				fl.setAD_Org_ID(AD_Org_ID);
 		}
 		//  APP
-		else if (getDocumentType().equals(DOCTYPE_APPayment))
+		else if (getDocumentType().equals(DOCTYPE_APPayment)
+				&& m_GL_Category_ID != 0)
 		{
 			MAccount acct = null;
 			if (getC_Charge_ID() != 0)
@@ -188,7 +217,8 @@ public class Doc_Payment extends Doc
 		}
 		//
 		ArrayList<Fact> facts = new ArrayList<Fact>();
-		facts.add(fact);
+		if(m_GL_Category_ID != 0)
+			facts.add(fact);
 		return facts;
 	}   //  createFact
 
