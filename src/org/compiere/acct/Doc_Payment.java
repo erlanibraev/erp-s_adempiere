@@ -108,16 +108,8 @@ public class Doc_Payment extends Doc
 	 */
 	public ArrayList<Fact> createFacts (MAcctSchema as)
 	{
-		//  create Fact Header
-		Fact fact = new Fact(this, as, Fact.POST_Actual);
-		//	Cash Transfer
-		if ("X".equals(m_TenderType))
-		{
-			ArrayList<Fact> facts = new ArrayList<Fact>();
-			facts.add(fact);
-			return facts;
-		}
 		
+		// V.Sokolov
 		int m_GL_Category_ID = 0; 
 		String sql_ = "SELECT GL_Category_ID FROM C_DocType WHERE C_DocType_ID=?";
 		PreparedStatement pstmt = null;
@@ -143,10 +135,23 @@ public class Doc_Payment extends Doc
 			pstmt = null;
 		}
 		
+		// not to create entries V.Sokolov 
+		ArrayList<Fact> facts_ = new ArrayList<Fact>();
+		if(m_GL_Category_ID != 0 && m_GL_Category_ID != 1000001)
+			return facts_;
+		
+		//  create Fact Header
+		Fact fact = new Fact(this, as, Fact.POST_Actual);
+		//	Cash Transfer
+		if ("X".equals(m_TenderType))
+		{
+			ArrayList<Fact> facts = new ArrayList<Fact>();
+			facts.add(fact);
+			return facts;
+		}
+		
 		int AD_Org_ID = getBank_Org_ID();		//	Bank Account Org	
-		if (getDocumentType().equals(DOCTYPE_ARReceipt) 
-				&& m_GL_Category_ID != 0
-				&& m_GL_Category_ID != 1000001)
+		if (getDocumentType().equals(DOCTYPE_ARReceipt))
 		{
 			//	Asset
 			FactLine fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
@@ -178,9 +183,7 @@ public class Doc_Payment extends Doc
 				fl.setAD_Org_ID(AD_Org_ID);
 		}
 		//  APP
-		else if (getDocumentType().equals(DOCTYPE_APPayment)
-				&& m_GL_Category_ID != 0
-				&& m_GL_Category_ID != 1000001)
+		else if (getDocumentType().equals(DOCTYPE_APPayment))
 		{
 			MAccount acct = null;
 			if (getC_Charge_ID() != 0)
@@ -217,11 +220,10 @@ public class Doc_Payment extends Doc
 			log.log(Level.SEVERE, p_Error);
 			fact = null;
 		}
+
 		//
-		ArrayList<Fact> facts = new ArrayList<Fact>();
-		if(m_GL_Category_ID != 0 && m_GL_Category_ID != 1000001)
-			facts.add(fact);
-		return facts;
+		facts_.add(fact);
+		return facts_;
 	}   //  createFact
 
 	/**
