@@ -145,7 +145,8 @@ public class Doc_Payment extends Doc
 		
 		int AD_Org_ID = getBank_Org_ID();		//	Bank Account Org	
 		if (getDocumentType().equals(DOCTYPE_ARReceipt) 
-				&& m_GL_Category_ID != 0)
+				&& m_GL_Category_ID != 0
+				&& m_GL_Category_ID != 1000001)
 		{
 			//	Asset
 			FactLine fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
@@ -178,7 +179,8 @@ public class Doc_Payment extends Doc
 		}
 		//  APP
 		else if (getDocumentType().equals(DOCTYPE_APPayment)
-				&& m_GL_Category_ID != 0)
+				&& m_GL_Category_ID != 0
+				&& m_GL_Category_ID != 1000001)
 		{
 			MAccount acct = null;
 			if (getC_Charge_ID() != 0)
@@ -217,7 +219,7 @@ public class Doc_Payment extends Doc
 		}
 		//
 		ArrayList<Fact> facts = new ArrayList<Fact>();
-		if(m_GL_Category_ID != 0)
+		if(m_GL_Category_ID != 0 && m_GL_Category_ID != 1000001)
 			facts.add(fact);
 		return facts;
 	}   //  createFact
