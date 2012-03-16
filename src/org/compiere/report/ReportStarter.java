@@ -511,7 +511,7 @@ public class ReportStarter implements ProcessCall, ClientProcess
             params.put("AD_PINSTANCE_ID", new Integer( AD_PInstance_ID));
 
             // FR [3123850] - Add continuosly needed parameters to Jasper Starter - Carlos Ruiz - GlobalQSS
-        	params.put("AD_CLIENT_ID", new Integer( Env.getAD_Client_ID(Env.getCtx())));
+        	params.put("ad_client_id", new Integer( Env.getAD_Client_ID(Env.getCtx())));
         	params.put("AD_ORG_ID", new Integer( Env.getAD_Org_ID(Env.getCtx())));
         	params.put("AD_ORG_NAME", Env.getContext(ctx, "#AD_Org_Name"));
         	params.put("AD_ROLE_ID", new Integer( Env.getAD_Role_ID(Env.getCtx())));
