@@ -516,7 +516,7 @@ public class ReportStarter implements ProcessCall, ClientProcess
         	params.put("AD_ORG_NAME", Env.getContext(ctx, "#AD_Org_Name"));
         	params.put("AD_ROLE_ID", new Integer( Env.getAD_Role_ID(Env.getCtx())));
         	params.put("AD_USER_ID", new Integer( Env.getAD_User_ID(Env.getCtx())));
-        	params.put("subreport_dir", reportDir);
+        	params.put("SUBREPORT_DIR", reportDir+"\\");
 
         	Language currLang = Env.getLanguage(Env.getCtx());
         	String printerName = null;
