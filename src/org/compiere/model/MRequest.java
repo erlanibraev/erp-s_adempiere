@@ -1204,6 +1204,11 @@ public class MRequest extends X_R_Request
 				if (X_AD_User.NOTIFICATIONTYPE_EMail.equals(NotificationType)
 					|| X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(NotificationType))
 				{
+					switch (getStatus().getR_Status_ID()) {
+						case 1000003: to = MUser.get (getCtx(), getCreatedBy()); break;
+					    default:  to = MUser.get (getCtx(), getSalesRep_ID()); break;
+					}
+					
 					if (client.sendEMail(from, to, subject, message.toString(), pdf)) 
 					{
 						success++;
