@@ -26,7 +26,6 @@
   	    <delete dir="${adempiere.customLibDir}"/>  -->
   </target>
   <target name="init" depends="clean" description="inicializa">
-    <echo message="Inicializando proyecto ..."/>
     <echo message="Trunk PATH: ${adempiere.trunk}"/>
     <echo message="ADempiere home: ${adempiere.home}"/>
   	<echo message="ZK Deploy dir: ${adempiere.zkCustomLibDir}"/>
@@ -55,13 +54,13 @@
 
   <target name="compile" depends="init" description="compilando codigo fuente ">
        <!-- Compila el codigo java (base) desde ${src} a ${build_java}  -->
-    <javac srcdir="${src}" destdir="${buildJava}">
+    <javac srcdir="${src}" destdir="${buildJava}" includeantruntime="false">
       <classpath refid="lib.class.path"/>
     </javac>
     
   	<!-- Compila el codigo java (de ZK) desde ${srcZk} a ${buildWeb)-->
-  	<javac srcdir="${srcZk}" destdir="${buildWeb}">
-  	      <classpath refid="lib.class.path"/> 
+  	    <javac srcdir="${srcZk}" destdir="${buildWeb}" includeantruntime="false" encoding="UTF-8">
+  	      <classpath refid="lib.class.path"/>
   	    </javac>
   </target>
 
