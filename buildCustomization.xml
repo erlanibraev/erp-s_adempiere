@@ -1,11 +1,12 @@
-<project name="smj" default="dist" basedir=".">
+<project name="custom" default="dist" basedir=".">
     <description>
-        Creacion de personalizacion smj : www.smartjsp.com
+    	Settings from Vladimir Sokolov
     </description>
-  <!-- define propiesdades para este build -->
+  <!-- define properties for this build -->
   <property file="buildCustomization.properties"/>
   <property name="src" location="src"/>
   <property name="srcWeb" location="zkwebui"/>
+  <property name="webui" value="WEB-INF/classes/org/adempiere/webui"/>
   <property name="srczk" location="srczk"/>
   <property name="buildWeb" location="build/WEB-INF/classes"/>	
   <property name="build" location="build"/>
@@ -39,28 +40,28 @@
   	    <mkdir dir="${buildJava}"/>
     <!-- Create directory del build para Web-->
     <mkdir dir="${build}"/>
-  	<copy todir="${buildJava}">
-  	  	     	<fileset dir="${src}">
-  	  	  	       <include name="**/*.png"/>
-  	  	     	   <exclude name="**/*.java"/>
+  	<mkdir dir="${build}/${webui}"/>
+  	  	<copy todir="${buildJava}">
+  	  	  	     	<fileset dir="${src}">
+  	  	  	  	       <include name="**/*.png"/>
+  	  	  	     	   <exclude name="**/*.java"/>
+  	  	  	  		 </fileset>
+  	  	  	</copy>
+  	  	<copy todir="${build}/${webui}">
+  	  	     	<fileset dir="${srcWeb}/${webui}">
+  	  	  	       <include name="**/*"/>
   	  	  		 </fileset>
   	  	</copy>
-  	<copy todir="${build}">
-  	     	<fileset dir="${srcWeb}">
-  	  	       <include name="**/*"/>
-  	  		 </fileset>
-  	</copy>
-  	<mkdir dir="${build}/WEB-INF/classes"/>
   </target>
 
-  <target name="compile" depends="init" description="compilando codigo fuente ">
+  <target name="compile" depends="init" description="compiling source code ">
   	
-  	<!-- Compila el codigo java (de ZK) desde ${srcZk} a ${buildWeb)-->
+  	<!-- Compile the java code (ZK) from ${srcZk} to ${buildWeb)-->
   	    <javac srcdir="${srczk}" destdir="${buildWeb}" includeantruntime="false" encoding="UTF-8">
   	      <classpath refid="lib.class.path"/>
   	    </javac>
   	
-       <!-- Compila el codigo java (base) desde ${src} a ${build_java}  -->
+       <!-- Compile the java code (base) from ${src} to ${build_java}  -->
     <javac srcdir="${src}" destdir="${buildJava}" includeantruntime="false" encoding="UTF-8">
       <classpath refid="lib.class.path"/>
     </javac>
@@ -68,14 +69,14 @@
   </target>
 
   <target name="dist" depends="compile" description="generate jar final" >
-    <!-- Crea directorio para despligue del jar -->
+    <!-- Create directory for deploying the jar -->
   	<mkdir dir="${adempiere.customLibDir}"/>
-  	<!-- Crea directorio para despligue del jar de ZK -->
+  	<!-- Create directory for deploying the jar of ZK -->
     <mkdir dir="${adempiere.zkCustomLibDir}"/>
   	
-  	<!-- crea archivo .jar file de solo java  -->
+  	<!-- create file. jar file java-only  -->
   	<jar jarfile="${adempiere.customLibDir}/${adempiere.customJarFile}" basedir="${buildJava}"/>
-  	 <!-- crea archivo .jar file de zk-->
+  	 <!-- create file. jar file of zk-->
     <jar jarfile="${adempiere.zkCustomLibDir}/${adempiere.zkCustomJarFile}" basedir="${build}"/>
   	
   </target>
