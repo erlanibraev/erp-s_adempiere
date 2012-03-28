@@ -6,7 +6,7 @@
   <property file="buildCustomization.properties"/>
   <property name="src" location="src"/>
   <property name="srcWeb" location="zkwebui"/>
-  <property name="srcZk" location="srczk"/>
+  <property name="srczk" location="srczk"/>
   <property name="buildWeb" location="build/WEB-INF/classes"/>	
   <property name="build" location="build"/>
   <property name="buildJava" location="buildJava"/>
@@ -15,6 +15,7 @@
   <path id="lib.class.path">
      <fileset dir="${adempiere.home}/lib">
         <include name="*.jar"/>
+     	<include name="*.war"/>
      </fileset>
   </path>
   <target name="clean"
@@ -32,11 +33,11 @@
   	<echo message="Zk Jar file dir: ${adempiere.zkCustomLibDir}/${adempiere.zkCustomJarFile}"/>
   	<echo message="Deploy dir Java: ${adempiere.customLibDir}"/>
   	<echo message="Jar file dir: ${adempiere.customLibDir}/${adempiere.customJarFile}"/>
-    <!-- Crea the time stamp -->
+    <!-- Create the timestamp -->
     <tstamp/>
-  	<!-- Crea el directorio del build -->
+  	<!-- Create directory del build -->
   	    <mkdir dir="${buildJava}"/>
-    <!-- Crea el directorio del build para Web-->
+    <!-- Create directory del build para Web-->
     <mkdir dir="${build}"/>
   	<copy todir="${buildJava}">
   	  	     	<fileset dir="${src}">
@@ -53,18 +54,20 @@
   </target>
 
   <target name="compile" depends="init" description="compilando codigo fuente ">
+  	
+  	<!-- Compila el codigo java (de ZK) desde ${srcZk} a ${buildWeb)-->
+  	    <javac srcdir="${srczk}" destdir="${buildWeb}" includeantruntime="false" encoding="UTF-8">
+  	      <classpath refid="lib.class.path"/>
+  	    </javac>
+  	
        <!-- Compila el codigo java (base) desde ${src} a ${build_java}  -->
-    <javac srcdir="${src}" destdir="${buildJava}" includeantruntime="false">
+    <javac srcdir="${src}" destdir="${buildJava}" includeantruntime="false" encoding="UTF-8">
       <classpath refid="lib.class.path"/>
     </javac>
     
-  	<!-- Compila el codigo java (de ZK) desde ${srcZk} a ${buildWeb)-->
-  	    <javac srcdir="${srcZk}" destdir="${buildWeb}" includeantruntime="false" encoding="UTF-8">
-  	      <classpath refid="lib.class.path"/>
-  	    </javac>
   </target>
 
-  <target name="dist" depends="compile" description="genera el jar final" >
+  <target name="dist" depends="compile" description="generate jar final" >
     <!-- Crea directorio para despligue del jar -->
   	<mkdir dir="${adempiere.customLibDir}"/>
   	<!-- Crea directorio para despligue del jar de ZK -->
