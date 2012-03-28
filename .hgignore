@@ -13,4 +13,5 @@ test.properties
 buildCustomization.properties
 syntax: regexp
 
-^zkwebui/WEB-INF/classes$
+^zkwebui/*
+^bin/*
