@@ -24,7 +24,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 
 import org.adempiere.exceptions.DBException;
 import org.compiere.util.CLogger;
@@ -994,23 +993,14 @@ public class MRequest extends X_R_Request
 			return success;
 		
 		//	Create Update
-		if (newRecord)
+		if (newRecord && getResult() != null)
 		{
-			// begin - V.Sokolov
-			int usrID = Env.getAD_User_ID(getCtx());
-			if(usrID != 0 && getR_Request_ID() != 0){
-				// sql injection
-				StringBuffer sql_ = new StringBuffer("INSERT into r_requestupdates SELECT a.createdby,");
-				sql_.append("a.r_request_id, a.ad_client_id, a.ad_org_id,");
-				sql_.append("a.isactive, a.created,  ? as AD_User_ID,");
-				sql_.append("a.updated, ? as UpdatedBy, 'N' as IsSelfService");
-				sql_.append(" FROM  adempiere.r_request as a WHERE a.r_request_id=?");
-				DB.executeUpdateEx(sql_.toString(), new Object[]{usrID, usrID, getR_Request_ID()}, get_TrxName());
-			}// end - V.Sokolov
-			
-			// Initial Mail
-			sendNotices(new ArrayList<String>());
+			MRequestUpdate update = new MRequestUpdate(this);
+			update.save();
 		}
+		//	Initial Mail
+		if (newRecord)
+			sendNotices(new ArrayList<String>());
 
 		//	ChangeRequest - created in Request Processor
 		if (getM_ChangeRequest_ID() != 0
@@ -1158,7 +1148,12 @@ public class MRequest extends X_R_Request
 				int AD_Role_ID = rs.getInt(5);
 				if (rs.wasNull())
 					AD_Role_ID = -1;
-				
+				int R_Status_ID = getStatus().getR_Status_ID(); 
+				if ((R_Status_ID== 1000002 || R_Status_ID == 1000003)
+					&& (getSalesRep_ID()==AD_User_ID)) { 
+						AD_User_ID= getCreatedBy();
+						Name = getCreatedByName();
+				}
 				//	Don't send mail to oneself
 		//		if (AD_User_ID == UpdatedBy)
 		//			continue;
@@ -1204,11 +1199,6 @@ public class MRequest extends X_R_Request
 				if (X_AD_User.NOTIFICATIONTYPE_EMail.equals(NotificationType)
 					|| X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(NotificationType))
 				{
-					switch (getStatus().getR_Status_ID()) {
-						case 1000003: to = MUser.get (getCtx(), getCreatedBy()); break;
-					    default:  to = MUser.get (getCtx(), getSalesRep_ID()); break;
-					}
-					
 					if (client.sendEMail(from, to, subject, message.toString(), pdf)) 
 					{
 						success++;
