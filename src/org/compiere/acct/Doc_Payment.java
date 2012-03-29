@@ -137,7 +137,7 @@ public class Doc_Payment extends Doc
 		
 		// not to create entries V.Sokolov 
 		ArrayList<Fact> facts_ = new ArrayList<Fact>();
-		if(m_GL_Category_ID != 0 && m_GL_Category_ID != 1000001)
+		if(m_GL_Category_ID == 0 || m_GL_Category_ID == 1000001)
 			return facts_;
 		
 		//  create Fact Header
