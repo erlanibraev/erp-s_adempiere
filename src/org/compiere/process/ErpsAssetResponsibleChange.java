@@ -12,7 +12,6 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 
 	private String finalMsg = "OK";
 	private MerpsrecTransDocLine[] lines;
-	private MerpsrecTransDocSigned[] signed;
 	private MerpsreceptTransmissionDoc TransmissionDoc = null;
 	
 	/**	Static Logger	*/
@@ -32,7 +31,6 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 		//
 		TransmissionDoc = new MerpsreceptTransmissionDoc(getCtx(), getRecord_ID(), get_TrxName());
 		lines = TransmissionDoc.getLines();
-		signed = TransmissionDoc.getSigned();
 
 	}
 
@@ -44,7 +42,7 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 			return encoder.encodeUTF8("Error. TransmissionDoc is null");
 		}
 		
-		if(lines.length == 0 || signed.length == 0){
+		if(lines.length == 0){
 			s_log.log(Level.SEVERE, "TransmissionDocLine or TransmissionDocSigned is null");
 			return encoder.encodeUTF8("TransmissionDocLine or TransmissionDocSigned is null");
 		}
@@ -58,63 +56,10 @@ public class ErpsAssetResponsibleChange extends SvrProcess {
 			dl.saveUpdate();
 		}
 		
-		//Signed		
-		for(MerpsrecTransDocSigned s: signed){
-			s.setProcessed(true);
-			s.saveUpdate();
-		}
-		
 		TransmissionDoc.setProcessed(true);
 		TransmissionDoc.saveUpdate();
 		
-		/*String sql_main_rec = "SELECT * "
-				+ "FROM erps_recepttransmissiondoc "
-				+ "WHERE erps_recepttransmissiondoc_id =" + p_erp_TransDoc_ID;
-			String sql_mainline_doc = "SELECT a_asset_id "
-					+ "FROM erps_rectransdocline "
-					+ "WHERE erps_recepttransmissiondoc_id =" + p_erp_TransDoc_ID;
-			PreparedStatement pstmt = null;
-			ResultSet rs = null;
-			try {
-				pstmt = DB.prepareStatement(sql_main_rec, get_TrxName());
-				rs = pstmt.executeQuery();
-				while (rs.next()) {
-					p_erp_C_BPartner_ID = rs.getInt("erps_toResponsible"); 
-				}
-				pstmt = null;
-				rs = null;
-				pstmt = DB.prepareStatement(sql_mainline_doc, get_TrxName());
-				rs = pstmt.executeQuery();
-				while (rs.next()) {
-					p_erp_A_Asset_ID = rs.getInt("a_asset_id");
-				}
-				if (p_erp_A_Asset_ID != 0 && p_erp_C_BPartner_ID != 0) {
-					String sql_empl_upd = "UPDATE a_asset "
-							+ "set c_bpartnersr_id =" + p_erp_C_BPartner_ID
-							+ " WHERE a_asset_id =" + p_erp_A_Asset_ID;
-					pstmt = null;
-					pstmt = DB.prepareStatement(sql_empl_upd, get_TrxName());
-					pstmt.execute();
-					log.log(Level.INFO, p_erp_A_Asset_ID.toString());
-					finalMsg = encoder.encodeUTF8("Основное средство № " + new Integer(p_erp_A_Asset_ID).toString() + " изменено...");
-				} else {
-					if (p_erp_A_Asset_ID == 0) {
-						finalMsg = encoder.encodeUTF8("Основное средство не выбрано...");
-					}
-					if (p_erp_C_BPartner_ID == 0) {
-						finalMsg = finalMsg + " " + encoder.encodeUTF8("Не выбран бизнес партнер...");
-					}
-				}
-//				setProcessed(true);
-			} catch (Exception e) {
-				log.log(Level.SEVERE, sql_main_rec, e);
-				finalMsg = encoder.encodeUTF8("Ошибка - " + e.getMessage());
-				throw e;
-			} finally {
-					DB.close(rs, pstmt);
-					rs = null; pstmt = null;
-			}	*/
-			return finalMsg;
+		return finalMsg;
 	}
 
 }
