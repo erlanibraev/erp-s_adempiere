@@ -92,7 +92,8 @@ public class InfoAsset extends Info
 	/**  Array of Column Info    */
 	private static final Info_Column[] s_assetLayout = {
 		new Info_Column(" ", "a.A_Asset_ID", IDColumn.class),
-		new Info_Column(Msg.translate(Env.getCtx(), "Value"), "a.Value", String.class),
+		new Info_Column(Msg.translate(Env.getCtx(), "Inventory number"), "a.Value", String.class),
+		new Info_Column(Msg.translate(Env.getCtx(), "Serial number"), "a.serNo", String.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "Name"), "a.Name", String.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "M_Product_ID"), "p.Name", String.class),
 		new Info_Column(Msg.translate(Env.getCtx(), "Responsible"), "bp.Name",  String.class),

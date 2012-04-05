@@ -1263,6 +1263,8 @@ public abstract class Doc
 	public static final int 	ACCTTYPE_BankInTransit  = 11;
 	/** Account Type - Payment - Selection */
 	public static final int     ACCTTYPE_PaymentSelect  = 12;
+	/** Account Type - Payment - Selection */
+	public static final int     ACCTTYPE_PaymentSelect2  = 121;
 	/** Account Type - Payment - Prepayment */
 	public static final int 	ACCTTYPE_C_Prepayment  = 13;
 	/** Account Type - Payment - Prepayment */
@@ -1381,7 +1383,13 @@ public abstract class Doc
 			sql = "SELECT B_PaymentSelect_Acct FROM C_BankAccount_Acct WHERE C_BankAccount_ID=? AND C_AcctSchema_ID=?";
 			para_1 = getC_BankAccount_ID();
 		}
-		
+		//A.Nurpiisov------------------------------{
+		else if (AcctType == ACCTTYPE_PaymentSelect2)
+		{
+			sql = "SELECT v_prepayment_acct FROM c_bp_vendor_acct WHERE c_bpartner_id=? AND C_AcctSchema_ID=?";
+			para_1 = getC_BPartner_ID();
+		}		
+		//}----------------------------------------
 		/** Account Type - Allocation   */
 		else if (AcctType == ACCTTYPE_DiscountExp)
 		{
