@@ -768,14 +768,14 @@ public class Import1C {
 		   || AttrVal.getProperty(cBPAcc)==null)
 			return;
 		
-		//if (!"ERP-01318".equals(AttrVal.getProperty(cDocNum))) return;
+		//if (!"ERP-01442".equals(AttrVal.getProperty(cDocNum))) return;
 		int iPaymentID = 0;
 		String sql = "SELECT c_payment_id FROM c_payment"
   			+ " WHERE ad_client_id = " + AD_Client_ID
 //  			+ " AND ad_org_id = " + AD_Org_ID
   			+ " AND isactive='Y'"  			
   			+ " AND documentno = '" + AttrVal.getProperty(cDocNum) + "'"
-  			+ " AND dateacct = '" + AttrVal.getProperty(cDocDate) + "'";
+  			+ " AND dateacct = to_date('" + AttrVal.getProperty(cDocDate) + "','dd.mm.yy')";
 		if (SingleSQLSelect(sql)) iPaymentID = Integer.valueOf(sRes1);
 		
 	    int iInvoiceID=0, iChargeID=0, iBPBankAccountID=0;
@@ -862,7 +862,6 @@ public class Import1C {
             	(iChargeID == 1000010) | //1611
             	(iChargeID == 1000024)) //3311 
             	iChargeID = 0;	
-    	
         BigDecimal bPayAmt = new BigDecimal(childAttrVal.getProperty(cPayAmt));
 		DateFormat formatter = new SimpleDateFormat("dd.MM.yy");
 		Date date = (Date)formatter.parse(AttrVal.getProperty(cDocDate));
@@ -886,7 +885,8 @@ public class Import1C {
 		payment.setTenderType("A"); //TENDERTYPE_Check
 		payment.setC_BankAccount_ID(iBankAccountID);
 		payment.setC_BP_BankAccount_ID(iBPBankAccountID);
-		payment.setDescription(AttrVal.getProperty("Content"));
+        if (iChargeID==1000003) payment.setDescription("");     	
+		else payment.setDescription(AttrVal.getProperty("Content"));
 //		payment.setRoutingNo(null);
 //		payment.setAccountNo(null);
 //		payment.setCheckNo(null);
@@ -964,7 +964,7 @@ public class Import1C {
   			+ " WHERE ad_client_id = " + AD_Client_ID
   			+ " AND isactive='Y'"  			
   			+ " AND name = '" + AttrVal.getProperty(cDocNum) + "'"
-  			+ " AND statementdate = '" + AttrVal.getProperty(cDocDate) + "'";
+  			+ " AND statementdate = to_date('" + AttrVal.getProperty(cDocDate) + "','dd.mm.yy')";
 		int iBS = 0;
 		if (SingleSQLSelect(sql)) iBS = Integer.valueOf(sRes1);
 		
@@ -1067,12 +1067,13 @@ public class Import1C {
 						+ " WHERE ad_client_id = " + AD_Client_ID
 						+ " AND isactive='Y'"  			
 						+ " AND c_bpartner_id = " + line.getC_BPartner_ID() 
-						+ " AND dateacct = '"+AttrVal.getProperty(cDocDate)+"'"
+						+ " AND dateacct = to_date('"+AttrVal.getProperty(cDocDate)+"','dd.mm.yy')"
 						+ " AND payamt = '" +childAttrVal.getProperty("Expenditure")+"'";
 				if (SingleSQLSelect(sql)) iPaymentID = Integer.valueOf(sRes1);
 				else iPaymentID = 0;
 			}
-			line.setDescription(childAttrVal.getProperty("PaymentPurpose"));
+			if (iBDDS==1000066) line.setDescription(childAttrVal.getProperty(""));
+			else line.setDescription(childAttrVal.getProperty("PaymentPurpose"));
 			line.setStatementLineDate(timeStampDate);
 			line.setDateAcct(timeStampDate);
 			line.setValutaDate(timeStampDate);
