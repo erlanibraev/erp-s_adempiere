@@ -190,10 +190,11 @@ public class Doc_BankStatement extends Doc
 			
 			if(line.getC_Payment_ID() != 0){
 				
-				
-				String sql = 	" SELECT d.docbasetype, p.c_order_id, p.c_invoice_id " + 
-							 	" FROM c_payment p, c_doctype d " +
-							 	" where p.c_doctype_id = d.c_doctype_id " +
+				 
+				String sql = 	" SELECT d.docbasetype, p.c_order_id, p.c_invoice_id, b.isemployee " + 
+							 	" FROM c_payment p " +
+							 	" inner join c_doctype d on d.c_doctype_id = p.c_doctype_id " +
+							 	" inner join c_bpartner b on b.c_bpartner_id = p.c_bpartner_id " +
 							 	" and p.c_payment_id = ? "; 
 				PreparedStatement pstmt = null;
 				ResultSet rsDT = null;
@@ -203,29 +204,34 @@ public class Doc_BankStatement extends Doc
 					pstmt.setInt(1, line.getC_Payment_ID());
 					rsDT = pstmt.executeQuery();
 					if (rsDT.next()){
-						String typedoc = rsDT.getString(1);
-						if (!typedoc.equals("") || typedoc != null && typedoc.equals("APP")){
-							
-							int c_order_id = rsDT.getInt(2);
-							int c_invoice_id = rsDT.getInt(3);
-							
-							if(c_order_id != 0)
-								acct_bank_in_transit = getAccount(Doc.ACCTTYPE_PaymentSelect2, as);
-							else 
-								acct_bank_in_transit = getAccount(Doc.ACCTTYPE_PaymentSelect, as);
-							
-						}else if(!typedoc.equals("") || typedoc != null && typedoc.equals("ARR")){
-							
-							int c_order_id = rsDT.getInt(2);
-							int c_invoice_id = rsDT.getInt(3);
-							
-							if(c_order_id != 0)
-								acct_bank_in_transit = getAccount(Doc.ACCTTYPE_PaymentSelect2, as);
-							else 
-								acct_bank_in_transit = getAccount(Doc.ACCTTYPE_PaymentSelect, as);
-							
-						}else			
-							st = true;
+						String isemployee = rsDT.getString(4);						
+						if((!isemployee.equals("") || isemployee != null) && isemployee.equals("Y")){
+							acct_bank_in_transit = getAccount(Doc.ACCTTYPE_Employee, as);
+						}else{
+							String typedoc = rsDT.getString(1);
+							if ((!typedoc.equals("") || typedoc != null) && typedoc.equals("APP")){
+								
+								int c_order_id = rsDT.getInt(2);
+								int c_invoice_id = rsDT.getInt(3);
+								
+								if(c_order_id != 0)
+									acct_bank_in_transit = getAccount(Doc.ACCTTYPE_PaymentSelect2, as);
+								else 
+									acct_bank_in_transit = getAccount(Doc.ACCTTYPE_PaymentSelect, as);
+								
+							}else if((!typedoc.equals("") || typedoc != null) && typedoc.equals("ARR")){
+								
+								int c_order_id = rsDT.getInt(2);
+								int c_invoice_id = rsDT.getInt(3);
+								
+								if(c_order_id != 0)
+									acct_bank_in_transit = getAccount(Doc.ACCTTYPE_CustomerContract, as);
+								else 
+									acct_bank_in_transit = getAccount(Doc.ACCTTYPE_CustomerInvoice, as);
+								
+							}else			
+								st = true;
+						}
 					}else st = true;
 				}
 				catch (SQLException e)

@@ -1263,8 +1263,16 @@ public abstract class Doc
 	public static final int 	ACCTTYPE_BankInTransit  = 11;
 	/** Account Type - Payment - Selection */
 	public static final int     ACCTTYPE_PaymentSelect  = 12;
-	/** Account Type - Payment - Selection */
-	public static final int     ACCTTYPE_PaymentSelect2  = 121;
+	//a.nurpiisov add accounts ------------------------------{
+	/** Account Type - Payment - Selection + a.nurpiisov*/
+	public static final int     ACCTTYPE_PaymentSelect2  = 121;	
+	/** employee accounts */
+	public static final int     ACCTTYPE_Employee = 122;
+	/** Account Type - Payment - Selection + a.nurpiisov*/
+	public static final int     ACCTTYPE_CustomerContract  = 123;	
+	/** employee accounts */
+	public static final int     ACCTTYPE_CustomerInvoice = 124;	
+	//-------------------------------------------------------}
 	/** Account Type - Payment - Prepayment */
 	public static final int 	ACCTTYPE_C_Prepayment  = 13;
 	/** Account Type - Payment - Prepayment */
@@ -1389,6 +1397,23 @@ public abstract class Doc
 			sql = "SELECT v_prepayment_acct FROM c_bp_vendor_acct WHERE c_bpartner_id=? AND C_AcctSchema_ID=?";
 			para_1 = getC_BPartner_ID();
 		}		
+		else if (AcctType == ACCTTYPE_Employee)
+		{
+			sql = "SELECT e_expense_acct FROM c_bp_employee_acct WHERE c_bpartner_id=? AND C_AcctSchema_ID=?";
+			para_1 = getC_BPartner_ID();
+		}				
+		else if (AcctType == ACCTTYPE_CustomerContract)
+		{
+			sql = "SELECT c_prepayment_acct FROM c_bp_customer_acct WHERE c_bpartner_id= ? AND C_AcctSchema_ID=?";
+			para_1 = getC_BPartner_ID();
+		}		
+		else if (AcctType == ACCTTYPE_CustomerInvoice)
+		{
+			sql = "SELECT c_receivable_acct FROM c_bp_customer_acct WHERE c_bpartner_id= ? AND C_AcctSchema_ID=?";
+			para_1 = getC_BPartner_ID();
+		}		
+		
+		//}----------------------------------------		
 		//}----------------------------------------
 		/** Account Type - Allocation   */
 		else if (AcctType == ACCTTYPE_DiscountExp)
