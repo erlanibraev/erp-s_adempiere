@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.compiere.apps.ADialog;
 import org.compiere.apps.ConfirmPanel;
 import org.compiere.apps.IProcessParameter;
@@ -47,7 +48,7 @@ import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 import org.compiere.util.Msg;
 
-public class ReportOsv implements FormPanel, ActionListener, TableModelListener, ASyncProcess
+public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 {
 	
 	/**	Logger			*/
@@ -61,6 +62,10 @@ public class ReportOsv implements FormPanel, ActionListener, TableModelListener,
 	private CPanel panel = new CPanel();
 	/**/
 	public boolean         m_isLocked = false;
+	/**/
+	private int cntEvent = 1;
+	/**/
+	private int AD_Process_ID;
 	
 	private static final long serialVersionUID = 6917300855914216888L;
 
@@ -72,44 +77,40 @@ public class ReportOsv implements FormPanel, ActionListener, TableModelListener,
 	}
 
 	@Override
-	public void unlockUI(ProcessInfo pi) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isUILocked() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void executeASync(ProcessInfo pi) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void tableChanged(TableModelEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+	/**
+	 *  Is the UI locked (Internal method)
+	 *  @return true, if UI is locked
+	 */
+	public boolean isUILocked()
+	{
+		return m_isLocked;
+	}   //  isLoacked
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
 		//  Generate PaySelection
 		if (e.getSource() == bGenerate)
 		{
+			//
+			AccountInfo mm = (AccountInfo)fieldAccount.getSelectedItem();
+			
+			if(mm.mSub1.equals("NA")){
+				ADialog.error(m_WindowNo, panel, "subkonto.select");
+				return;
+			}else if(fieldDate1.getValue() == null){
+				ADialog.error(m_WindowNo, panel, "date.select");
+				return;
+			}
+			
 			//  Prepare Process
-			int AD_Proces_ID = 1000044;	
-			ProcessInfo pi = new ProcessInfo (m_frame.getTitle(), AD_Proces_ID);
+			int Proces_ID = AD_Process_ID;	
+			ProcessInfo pi = new ProcessInfo (m_frame.getTitle(), Proces_ID);
 			pi.setAD_User_ID (Env.getAD_User_ID(Env.getCtx()));
 			pi.setAD_Client_ID(Env.getAD_Client_ID(Env.getCtx()));
 
 			List<ProcessInfoParameter> po = new ArrayList<ProcessInfoParameter>();
-			AccountInfo mm = (AccountInfo)fieldAccount.getSelectedItem();
-			
-				po.add(new ProcessInfoParameter("account_id",new BigDecimal(mm.mAccount_ID),null,"",""));
+			po.add(new ProcessInfoParameter("account_id",new BigDecimal(mm.mAccount_ID),null,"",""));
 			if((Boolean) sub1.getValue())
 				po.add(new ProcessInfoParameter("sub1","Y",null,"",""));
 			else
@@ -162,11 +163,117 @@ public class ReportOsv implements FormPanel, ActionListener, TableModelListener,
 		}else if(e.getSource() == bCancel){
 			dispose();
 		}else if(e.getSource() == fieldAccount){
+					
+			AccountInfo ai = (AccountInfo) fieldAccount.getSelectedItem();
+			if(ai.mSub1.equals("C") && ai.mSub2.equals("D")){
+				sub1.setVisible(true);
+				//
+				sub4.setVisible(false);sub4.setSelected(false);
+				sub5.setVisible(false);sub5.setSelected(false);
+				sub6.setVisible(false);sub6.setSelected(false);
+				//
+				sub7.setVisible(false);sub7.setSelected(false);
+				sub8.setVisible(false);sub8.setSelected(false);
+				sub9.setVisible(false);sub9.setSelected(false);
+				if(cntEvent == 1){
+					m_frame.setSize(m_frame.getWidth()+100, m_frame.getHeight()+100);
+					cntEvent++;
+				}
+			}else if(ai.mSub1.equals("C") && ai.mSub2.equals("P")){
+				sub4.setVisible(true);
+				//
+				sub1.setVisible(false);sub1.setSelected(false);
+				sub2.setVisible(false);sub2.setSelected(false);
+				sub3.setVisible(false);sub3.setSelected(false);
+				//
+				sub7.setVisible(false);sub7.setSelected(false);
+				sub8.setVisible(false);sub8.setSelected(false);
+				sub9.setVisible(false);sub9.setSelected(false);
+				if(cntEvent == 1){
+					m_frame.setSize(m_frame.getWidth()+100, m_frame.getHeight()+100);
+					cntEvent++;
+				}
+			}else if(ai.mSub1.equals("C") && ai.mSub2.equals("NA")){
+				sub1.setVisible(true);
+				sub4.setVisible(true);
+				//
+				sub2.setVisible(false);sub2.setSelected(false);
+				sub3.setVisible(false);sub3.setSelected(false);
+				sub5.setVisible(false);sub5.setSelected(false);
+				sub6.setVisible(false);sub6.setSelected(false);
+				//
+				sub7.setVisible(false);sub7.setSelected(false);
+				sub8.setVisible(false);sub8.setSelected(false);
+				sub9.setVisible(false);sub9.setSelected(false);
+				if(cntEvent == 1){
+					m_frame.setSize(m_frame.getWidth()+100, m_frame.getHeight()+100);
+					cntEvent++;
+				}
+			}
+			
+			if(ai.mSub1.equals("B") && ai.mSub2.equals("NA")){
+				sub7.setVisible(true);
+				sub1.setVisible(false);sub1.setSelected(false);
+				sub2.setVisible(false);sub2.setSelected(false);
+				sub3.setVisible(false);sub3.setSelected(false);
+				sub4.setVisible(false);sub4.setSelected(false);
+				sub5.setVisible(false);sub5.setSelected(false);
+				sub6.setVisible(false);sub6.setSelected(false);
+				if(cntEvent == 1){
+					m_frame.setSize(m_frame.getWidth()+100, m_frame.getHeight()+100);
+					cntEvent++;
+				}
+			}
 			
 		}else if(e.getSource() == sub1){
-			sub7.setVisible(false);
-			sub8.setVisible(false);
-			sub9.setVisible(false);
+			sub4.setSelected(false);
+			if(sub1.isSelected()){
+				sub2.setVisible(true);
+				sub5.setVisible(false);sub5.setSelected(false);
+				sub6.setVisible(false);sub6.setSelected(false);
+			}else{
+				sub2.setVisible(false);sub2.setSelected(false);
+				sub3.setVisible(false);sub3.setSelected(false);
+			}
+
+		}
+		else if(e.getSource() == sub4){
+			sub1.setSelected(false);
+			if(sub4.isSelected()){
+				sub5.setVisible(true);
+				sub2.setVisible(false);sub3.setVisible(false);
+				sub2.setSelected(false);sub3.setSelected(false);
+			}else{
+				sub5.setVisible(false);sub5.setSelected(false);
+				sub6.setVisible(false);sub6.setSelected(false);
+			}
+		}
+		else if(e.getSource() == sub2){
+			if(sub2.isSelected()){
+				sub3.setVisible(true);
+			}else{
+				sub3.setVisible(false);sub3.setSelected(false);
+			}
+		}
+		else if(e.getSource() == sub5){
+			if(sub5.isSelected()){
+				sub6.setVisible(true);
+			}else{
+				sub6.setVisible(false);sub6.setSelected(false);
+			}
+		}else if(e.getSource() == sub7){
+			if(sub7.isSelected()){
+				sub8.setVisible(true);
+			}else{
+				sub8.setVisible(false);sub8.setSelected(false);
+				sub9.setVisible(false);sub9.setSelected(false);
+			}
+		}else if(e.getSource() == sub8){
+			if(sub8.isSelected()){
+				sub9.setVisible(true);
+			}else{
+				sub9.setVisible(false);sub9.setSelected(false);
+			}
 		}
 		
 	}
@@ -233,20 +340,22 @@ public class ReportOsv implements FormPanel, ActionListener, TableModelListener,
 		PanelDate.setLayout(parameterLayout);
 		PanelSub.setLayout(parameterLayout);
 		//
-		sub1.setText(Msg.getMsg(Env.getCtx(), "sub1"));
-		sub2.setText(Msg.getMsg(Env.getCtx(), "sub2"));
-		sub3.setText(Msg.getMsg(Env.getCtx(), "sub3"));
-		sub4.setText(Msg.getMsg(Env.getCtx(), "sub4"));
-		sub5.setText(Msg.getMsg(Env.getCtx(), "sub5"));
-		sub6.setText(Msg.getMsg(Env.getCtx(), "sub6"));
-		sub7.setText(Msg.getMsg(Env.getCtx(), "sub7"));
-		sub8.setText(Msg.getMsg(Env.getCtx(), "sub8"));
-		sub9.setText(Msg.getMsg(Env.getCtx(), "sub9"));
+		sub1.setText(Msg.getMsg(Env.getCtx(), "sub1"));sub1.setVisible(false);
+		sub2.setText(Msg.getMsg(Env.getCtx(), "sub2"));sub2.setVisible(false);
+		sub3.setText(Msg.getMsg(Env.getCtx(), "sub3"));sub3.setVisible(false);
+		sub4.setText(Msg.getMsg(Env.getCtx(), "sub4"));sub4.setVisible(false);
+		sub5.setText(Msg.getMsg(Env.getCtx(), "sub5"));sub5.setVisible(false);
+		sub6.setText(Msg.getMsg(Env.getCtx(), "sub6"));sub6.setVisible(false);
+		sub7.setText(Msg.getMsg(Env.getCtx(), "sub7"));sub7.setVisible(false);
+		sub8.setText(Msg.getMsg(Env.getCtx(), "sub8"));sub8.setVisible(false);
+		sub9.setText(Msg.getMsg(Env.getCtx(), "sub9"));sub9.setVisible(false);
 		labelAccount.setText(Msg.translate(Env.getCtx(), "C_BankAccount_ID"));
-		labelDate1.setText(Msg.translate(Env.getCtx(), "date.from"));
-		labelDate2.setText(Msg.translate(Env.getCtx(), "date.to"));
+		labelDate1.setText(Msg.translate(Env.getCtx(), "startdate"));
+		labelDate2.setText(Msg.translate(Env.getCtx(), "enddate"));
 		fieldAccount.addActionListener(this);
-		sub1.addActionListener(this);
+		sub1.addActionListener(this);sub2.addActionListener(this);sub3.addActionListener(this);
+		sub4.addActionListener(this);sub5.addActionListener(this);sub6.addActionListener(this);
+		sub7.addActionListener(this);sub8.addActionListener(this);sub9.addActionListener(this);
 		//
 		bGenerate.addActionListener(this);
 		bCancel.addActionListener(this);
@@ -309,6 +418,34 @@ public class ReportOsv implements FormPanel, ActionListener, TableModelListener,
 			ADialog.error(m_WindowNo, panel, "account.select");
 		else
 			fieldAccount.setSelectedIndex(0);
+		
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		// KNOW THE ORDER TYPE
+		String sql_ = "select distinct t.ad_process_id from adempiere.ad_process t " +
+				"join adempiere.ad_process_para r on r.ad_process_id=t.ad_process_id " +
+				"where (lower(t.value) like lower('%osv_%') or lower(t.name) like lower('%osv_%')) " +
+				"and lower(r.name) like lower('%osv%')";
+		try
+		{
+			pstmt = DB.prepareStatement(sql_, null);
+			rs = pstmt.executeQuery();
+			if (rs.next())
+				AD_Process_ID = rs.getInt(1);
+		}
+		catch (SQLException e)
+		{
+			log.log(Level.SEVERE, "product", e);
+		}
+		finally
+		{
+			DB.close(rs, pstmt);
+			rs = null; pstmt = null;
+		}	
+		
+		//
+		fieldDate2.setValue(new Timestamp(System.currentTimeMillis()));
 	}
 
 	@Override
@@ -326,9 +463,9 @@ public class ReportOsv implements FormPanel, ActionListener, TableModelListener,
 		int m_AD_Client_ID = Env.getAD_Client_ID(Env.getCtx());
 		//  Bank Account Info
 		String sql = MRole.getDefault().addAccessSQL(
-			"SELECT c_elementvalue_id, value||' - '||name as name"
-			+" FROM c_elementvalue WHERE ad_client_id=? AND isactive='Y'"
-			+" ORDER BY value",
+			"SELECT c_elementvalue_id, value||' - '||name as name, " +
+			"coalesce(subkonto1,'NA')  as sub1, coalesce(subkonto2,'NA') as sub2"
+			+" FROM c_elementvalue WHERE ad_client_id=? AND isactive='Y' ORDER BY value",
 			"c_elementvalue", MRole.SQL_FULLYQUALIFIED, MRole.SQL_RW);
 		try
 		{
@@ -337,7 +474,7 @@ public class ReportOsv implements FormPanel, ActionListener, TableModelListener,
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next())
 			{
-				AccountInfo bi = new AccountInfo (rs.getInt(1), rs.getString(2));
+				AccountInfo bi = new AccountInfo (rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4));
 				data.add(bi);
 			}
 			rs.close();
@@ -359,16 +496,24 @@ public class ReportOsv implements FormPanel, ActionListener, TableModelListener,
 
 		private int mAccount_ID;
 		private String mAccountName;
+		private String mSub1;
+		private String mSub2;
+		
+		public AccountInfo (){
+			
+		};
 		
 		/**
 		 * 	AccountInfo
 		 *	@param Account_ID
 		 *	@param AccountName
 		 */
-		public AccountInfo (int Account_ID, String AccountName)
+		public AccountInfo (int Account_ID, String AccountName, String Sub1, String Sub2)
 		{
 			mAccount_ID = Account_ID;
 			mAccountName = AccountName;
+			mSub1 = Sub1;
+			mSub2 = Sub2;
 		}
 
 		/**
@@ -380,5 +525,17 @@ public class ReportOsv implements FormPanel, ActionListener, TableModelListener,
 			return mAccountName;
 		}
 	}   //  AccountInfo
+
+	@Override
+	public void unlockUI(ProcessInfo pi) {
+		m_frame.dispose();
+		
+	}
+
+	@Override
+	public void executeASync(ProcessInfo pi) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
