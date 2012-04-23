@@ -146,7 +146,15 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 			if((Boolean) sub9.getValue())
 				po.add(new ProcessInfoParameter("sub9","Y",null,"",""));
 			else
-				po.add(new ProcessInfoParameter("sub9","N",null,"",""));
+				po.add(new ProcessInfoParameter("sub10","N",null,"",""));
+			if((Boolean) sub10.getValue())
+				po.add(new ProcessInfoParameter("sub10","Y",null,"",""));
+			else
+				po.add(new ProcessInfoParameter("sub11","N",null,"",""));
+			if((Boolean) sub11.getValue())
+				po.add(new ProcessInfoParameter("sub11","Y",null,"",""));
+			else
+				po.add(new ProcessInfoParameter("sub11","N",null,"",""));
 			po.add(new ProcessInfoParameter("date1",(Timestamp)fieldDate1.getValue(),null,"",""));
 			po.add(new ProcessInfoParameter("date2",(Timestamp)fieldDate2.getValue(),null,"",""));
 			
@@ -166,7 +174,9 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 					
 			AccountInfo ai = (AccountInfo) fieldAccount.getSelectedItem();
 			if(ai.mSub1.equals("C") && ai.mSub2.equals("D")){
-				sub1.setVisible(true);
+				sub1.setSelected(false);sub1.setVisible(true);
+				sub2.setVisible(false);sub2.setSelected(false);
+				sub3.setVisible(false);sub3.setSelected(false);
 				//
 				sub4.setVisible(false);sub4.setSelected(false);
 				sub5.setVisible(false);sub5.setSelected(false);
@@ -175,12 +185,17 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 				sub7.setVisible(false);sub7.setSelected(false);
 				sub8.setVisible(false);sub8.setSelected(false);
 				sub9.setVisible(false);sub9.setSelected(false);
+				//
+				sub10.setVisible(false);sub10.setSelected(false);
+				sub11.setVisible(false);sub11.setSelected(false);
 				if(cntEvent == 1){
 					m_frame.setSize(m_frame.getWidth()+100, m_frame.getHeight()+100);
 					cntEvent++;
 				}
 			}else if(ai.mSub1.equals("C") && ai.mSub2.equals("P")){
-				sub4.setVisible(true);
+				sub4.setSelected(false);sub4.setVisible(true);
+				sub5.setVisible(false);sub5.setSelected(false);
+				sub6.setVisible(false);sub6.setSelected(false);
 				//
 				sub1.setVisible(false);sub1.setSelected(false);
 				sub2.setVisible(false);sub2.setSelected(false);
@@ -189,6 +204,9 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 				sub7.setVisible(false);sub7.setSelected(false);
 				sub8.setVisible(false);sub8.setSelected(false);
 				sub9.setVisible(false);sub9.setSelected(false);
+				//
+				sub10.setVisible(false);sub10.setSelected(false);
+				sub11.setVisible(false);sub11.setSelected(false);
 				if(cntEvent == 1){
 					m_frame.setSize(m_frame.getWidth()+100, m_frame.getHeight()+100);
 					cntEvent++;
@@ -205,26 +223,46 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 				sub7.setVisible(false);sub7.setSelected(false);
 				sub8.setVisible(false);sub8.setSelected(false);
 				sub9.setVisible(false);sub9.setSelected(false);
+				//
+				sub10.setVisible(false);sub10.setSelected(false);
+				sub11.setVisible(false);sub11.setSelected(false);
 				if(cntEvent == 1){
 					m_frame.setSize(m_frame.getWidth()+100, m_frame.getHeight()+100);
 					cntEvent++;
 				}
-			}
-			
-			if(ai.mSub1.equals("B") && ai.mSub2.equals("NA")){
-				sub7.setVisible(true);
+			}else if(ai.mSub1.equals("B") && ai.mSub2.equals("NA")){
+				sub7.setSelected(false);sub7.setVisible(true);
 				sub1.setVisible(false);sub1.setSelected(false);
 				sub2.setVisible(false);sub2.setSelected(false);
 				sub3.setVisible(false);sub3.setSelected(false);
 				sub4.setVisible(false);sub4.setSelected(false);
 				sub5.setVisible(false);sub5.setSelected(false);
 				sub6.setVisible(false);sub6.setSelected(false);
+				sub8.setVisible(false);sub8.setSelected(false);
+				sub9.setVisible(false);sub9.setSelected(false);
+				sub10.setVisible(false);sub10.setSelected(false);
+				sub11.setVisible(false);sub11.setSelected(false);
+				if(cntEvent == 1){
+					m_frame.setSize(m_frame.getWidth()+100, m_frame.getHeight()+100);
+					cntEvent++;
+				}
+			}else if(ai.mSub1.equals("S") && ai.mSub2.equals("NA")){
+				sub10.setSelected(false);sub10.setVisible(true);
+				sub1.setVisible(false);sub1.setSelected(false);
+				sub2.setVisible(false);sub2.setSelected(false);
+				sub3.setVisible(false);sub3.setSelected(false);
+				sub4.setVisible(false);sub4.setSelected(false);
+				sub5.setVisible(false);sub5.setSelected(false);
+				sub6.setVisible(false);sub6.setSelected(false);
+				sub7.setVisible(false);sub7.setSelected(false);
+				sub8.setVisible(false);sub8.setSelected(false);
+				sub9.setVisible(false);sub9.setSelected(false);
+				sub11.setVisible(false);sub11.setSelected(false);
 				if(cntEvent == 1){
 					m_frame.setSize(m_frame.getWidth()+100, m_frame.getHeight()+100);
 					cntEvent++;
 				}
 			}
-			
 		}else if(e.getSource() == sub1){
 			sub4.setSelected(false);
 			if(sub1.isSelected()){
@@ -235,7 +273,6 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 				sub2.setVisible(false);sub2.setSelected(false);
 				sub3.setVisible(false);sub3.setSelected(false);
 			}
-
 		}
 		else if(e.getSource() == sub4){
 			sub1.setSelected(false);
@@ -273,6 +310,12 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 				sub9.setVisible(true);
 			}else{
 				sub9.setVisible(false);sub9.setSelected(false);
+			}
+		}else if(e.getSource() == sub10){
+			if(sub10.isSelected()){
+				sub11.setVisible(true);
+			}else{
+				sub11.setVisible(false);sub11.setSelected(false);
 			}
 		}
 		
@@ -326,6 +369,8 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 	private VCheckBox sub7 = new VCheckBox();
 	private VCheckBox sub8 = new VCheckBox();
 	private VCheckBox sub9 = new VCheckBox();
+	private VCheckBox sub10 = new VCheckBox();
+	private VCheckBox sub11 = new VCheckBox();
 	
 	/**
 	 *  Static Init
@@ -349,6 +394,8 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 		sub7.setText(Msg.getMsg(Env.getCtx(), "sub7"));sub7.setVisible(false);
 		sub8.setText(Msg.getMsg(Env.getCtx(), "sub8"));sub8.setVisible(false);
 		sub9.setText(Msg.getMsg(Env.getCtx(), "sub9"));sub9.setVisible(false);
+		sub10.setText(Msg.getMsg(Env.getCtx(), "sub10"));sub10.setVisible(false);
+		sub11.setText(Msg.getMsg(Env.getCtx(), "sub11"));sub11.setVisible(false);
 		labelAccount.setText(Msg.translate(Env.getCtx(), "C_BankAccount_ID"));
 		labelDate1.setText(Msg.translate(Env.getCtx(), "startdate"));
 		labelDate2.setText(Msg.translate(Env.getCtx(), "enddate"));
@@ -356,6 +403,7 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 		sub1.addActionListener(this);sub2.addActionListener(this);sub3.addActionListener(this);
 		sub4.addActionListener(this);sub5.addActionListener(this);sub6.addActionListener(this);
 		sub7.addActionListener(this);sub8.addActionListener(this);sub9.addActionListener(this);
+		sub10.addActionListener(this);sub11.addActionListener(this);
 		//
 		bGenerate.addActionListener(this);
 		bCancel.addActionListener(this);
@@ -394,6 +442,11 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 		PanelSub.add(sub8,  new GridBagConstraints(1, 11, 1, 1, 0.0, 0.0
 				,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 		PanelSub.add(sub9,  new GridBagConstraints(1, 12, 1, 1, 0.0, 0.0
+				,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+		//
+		PanelSub.add(sub10,  new GridBagConstraints(1, 13, 1, 1, 0.0, 0.0
+				,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
+		PanelSub.add(sub11,  new GridBagConstraints(1, 14, 1, 1, 0.0, 0.0
 				,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
 		
 		commandPanel.setLayout(commandLayout);
