@@ -146,11 +146,11 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 			if((Boolean) sub9.getValue())
 				po.add(new ProcessInfoParameter("sub9","Y",null,"",""));
 			else
-				po.add(new ProcessInfoParameter("sub10","N",null,"",""));
+				po.add(new ProcessInfoParameter("sub9","N",null,"",""));
 			if((Boolean) sub10.getValue())
 				po.add(new ProcessInfoParameter("sub10","Y",null,"",""));
 			else
-				po.add(new ProcessInfoParameter("sub11","N",null,"",""));
+				po.add(new ProcessInfoParameter("sub10","N",null,"",""));
 			if((Boolean) sub11.getValue())
 				po.add(new ProcessInfoParameter("sub11","Y",null,"",""));
 			else
