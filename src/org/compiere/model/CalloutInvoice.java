@@ -694,10 +694,11 @@ public class CalloutInvoice extends CalloutEngine
 			}
 
 //			a.nurpiisov:10012012/16:54 - fix LineTotalAmt {
-			if (isTaxIncluded(WindowNo) == false)
-				mTab.setValue("LineTotalAmt", LineNetAmt.add(TaxAmt));
+			boolean isTaxIncuded = isTaxIncluded(WindowNo);
+			if (isTaxIncuded)
+				mTab.setValue("LineTotalAmt",  LineNetAmt);
 			else
-				mTab.setValue("LineTotalAmt",  LineNetAmt.subtract(TaxAmt));
+				mTab.setValue("LineTotalAmt", LineNetAmt.add(TaxAmt));
 //			}
 		}
 
