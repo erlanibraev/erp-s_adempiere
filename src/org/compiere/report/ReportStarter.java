@@ -407,6 +407,7 @@ public class ReportStarter implements ProcessCall, ClientProcess
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		
 		addProcessParameters(AD_PInstance_ID, params, trxName);
+		addProcessInfoParameters(params, pi.getParameter());
 		
 		/** Block for their reports. To add parameters ... (V.Sokolov)*/
 		if(params.containsKey("osv".toLowerCase())){
@@ -425,8 +426,6 @@ public class ReportStarter implements ProcessCall, ClientProcess
 		}
 
 		//
-		addProcessInfoParameters(params, pi.getParameter());
-
 		reportFile = getReportFile(reportPath, (String)params.get("ReportType"));
 		if (reportFile == null || reportFile.exists() == false)
 		{
