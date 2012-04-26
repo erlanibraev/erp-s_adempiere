@@ -176,7 +176,9 @@ public class Doc_Invoice extends DocMy
 				{
 					BigDecimal LineNetAmtTax = tax.calculateTax(LineNetAmt, true, getStdPrecision());
 					log.fine("LineNetAmt=" + LineNetAmt + " - Tax=" + LineNetAmtTax);
+					// a.nurpiisov: if tax is set by hand then don't correct lineNetAmt{
 					LineNetAmt = LineNetAmt.subtract(LineNetAmtTax);
+					//}
 					for (int t = 0; t < m_taxes.length; t++)
 					{
 						if (m_taxes[t].getC_Tax_ID() == C_Tax_ID)
@@ -312,7 +314,7 @@ public class Doc_Invoice extends DocMy
 		int ii = p_po.get_ColumnIndex("C_DocTypeTarget_ID");
 		if (ii != -1)
 			ii = (Integer)p_po.get_Value(ii);
-		System.out.println("Исходный тип документа C_DocTypeTarget_ID = "+ ii);
+		System.out.println("Р�СЃС…РѕРґРЅС‹Р№ С‚РёРї РґРѕРєСѓРјРµРЅС‚Р° C_DocTypeTarget_ID = "+ ii);
 		//  Cash based accounting
 		if (!as.isAccrual() | ii==1000044)
 			return facts;
