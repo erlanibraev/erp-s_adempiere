@@ -177,7 +177,7 @@ public class Doc_Invoice extends DocMy
 					BigDecimal LineNetAmtTax = tax.calculateTax(LineNetAmt, true, getStdPrecision());
 					log.fine("LineNetAmt=" + LineNetAmt + " - Tax=" + LineNetAmtTax);
 					// a.nurpiisov: if tax is set by hand then don't correct lineNetAmt{
-					LineNetAmt = LineNetAmt.subtract(LineNetAmtTax);
+					//LineNetAmt = LineNetAmt.subtract(LineNetAmtTax);
 					//}
 					for (int t = 0; t < m_taxes.length; t++)
 					{
