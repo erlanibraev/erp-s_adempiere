@@ -89,7 +89,7 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		//  Generate PaySelection
+		//  Generate
 		if (e.getSource() == bGenerate)
 		{
 			//
