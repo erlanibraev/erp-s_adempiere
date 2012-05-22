@@ -89,7 +89,7 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		//  Generate PaySelection
+		//  Generate
 		if (e.getSource() == bGenerate)
 		{
 			//
@@ -294,7 +294,7 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 		}
 		else if(e.getSource() == sub5){
 			if(sub5.isSelected()){
-				sub6.setVisible(true);
+				// sub6.setVisible(true);
 			}else{
 				sub6.setVisible(false);sub6.setSelected(false);
 			}
@@ -401,7 +401,7 @@ public class ReportOsv implements FormPanel, ActionListener, ASyncProcess
 		labelDate2.setText(Msg.translate(Env.getCtx(), "enddate"));
 		fieldAccount.addActionListener(this);
 		sub1.addActionListener(this);sub2.addActionListener(this);sub3.addActionListener(this);
-		sub4.addActionListener(this);sub5.addActionListener(this);sub6.addActionListener(this);
+		sub4.addActionListener(this);sub5.addActionListener(this);//sub6.addActionListener(this);
 		sub7.addActionListener(this);sub8.addActionListener(this);sub9.addActionListener(this);
 		sub10.addActionListener(this);sub11.addActionListener(this);
 		//
