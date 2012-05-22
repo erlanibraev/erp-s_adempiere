@@ -25,7 +25,6 @@ import java.util.logging.Level;
 
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
-import org.compiere.model.MCashLine;
 import org.compiere.model.MClientInfo;
 import org.compiere.model.MConversionRate;
 import org.compiere.model.MCostDetail;
@@ -35,6 +34,8 @@ import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MLandedCostAllocation;
 import org.compiere.model.MTax;
 import org.compiere.model.ProductCost;
+import org.compiere.model.X_A_Asset;
+import org.compiere.model.X_A_Asset_Addition;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
@@ -90,7 +91,6 @@ public class Doc_Invoice extends DocMy
 		m_taxes = loadTaxes();
 		p_lines = loadLines(invoice);
 		log.fine("Lines=" + p_lines.length + ", Taxes=" + m_taxes.length);
-		
 		return null;
 	}   //  loadDocumentDetails
 
@@ -310,9 +310,7 @@ public class Doc_Invoice extends DocMy
 		//  create Fact Header
 		Fact fact = new Fact(this, as, Fact.POST_Actual);
 		int ii = p_po.get_ColumnIndex("C_DocTypeTarget_ID");
-		if (ii != -1)
-			ii = (Integer)p_po.get_Value(ii);
-		System.out.println("Исходный тип документа C_DocTypeTarget_ID = "+ ii);
+		if (ii != -1) ii = (Integer)p_po.get_Value(ii);
 		//  Cash based accounting
 		if (!as.isAccrual() | ii==1000044)
 			return facts;
@@ -509,14 +507,38 @@ public class Doc_Invoice extends DocMy
 						 + " WHERE C_InvoiceLine_id = "+ line.get_ID()); 
 				int no = DB.getSQLValue(getTrxName(), sql.toString());
 				if (no>0) { 	
-				//System.out.println(sql.toString());	
-				//System.out.println("API asset_acct = "+no);
 					MAccount acct = MAccount.get (as.getCtx(), no);
 					fact.createLine(line, acct,
 							getC_Currency_ID(), line.getAmtSource(), null);
-					continue;
-				}
-				boolean landedCost = landedCost(as, fact, line, true);
+					X_A_Asset asset = new X_A_Asset (getCtx(), line.getA_Asset_ID(), getTrxName());
+					asset.setA_Asset_CreateDate(getDateAcct());
+					asset.setA_QTY_Current(line.getQty());
+					asset.setA_QTY_Original(line.getQty());
+					asset.save();
+					
+					sql = new StringBuffer (
+							"SELECT A_Asset_Addition_ID FROM A_Asset_Addition "
+							 + " WHERE C_InvoiceLine_id = "+ line.get_ID());
+					no = 0;
+					no = DB.getSQLValue(getTrxName(), sql.toString());
+
+					X_A_Asset_Addition assetadd = new X_A_Asset_Addition (getCtx(), no, getTrxName());
+					assetadd.setA_Asset_ID(asset.getA_Asset_ID());
+					assetadd.setAssetValueAmt(line.getAmtSource());
+					assetadd.setA_SourceType("INV");
+					assetadd.setA_CapvsExp("Exp");
+					assetadd.setM_InOutLine_ID(line.getLine());				
+					assetadd.setC_Invoice_ID(get_ID());
+					assetadd.setC_InvoiceLine_ID(line.get_ID());
+					//assetadd.setDocumentNo(getDocumentNo());
+					assetadd.setLine(line.getLine());
+					assetadd.setDescription(line.getDescription());
+					assetadd.setA_QTY_Current(line.getQty());
+					assetadd.setPostingType("A");
+					assetadd.save();					
+					continue; 
+				} else log.log(Level.SEVERE, "Asset has not Accounting Setup");
+ 				boolean landedCost = landedCost(as, fact, line, true);
 				if (landedCost && as.isExplicitCostAdjustment())
 				{
 					fact.createLine (line, line.getAccount(ProductCost.ACCTTYPE_P_Expense, as),
@@ -691,11 +713,9 @@ public class Doc_Invoice extends DocMy
 					fLines[i].setLocationFromOrg(fLines[i].getAD_Org_ID(), false);    //  to Loc
 				}
 			}
-			
-			// Liability CR
-			int payables_ID = getValidCombination_ID(Doc.ACCTTYPE_V_Liability,as);
-			int payablesServices_ID = getValidCombination_ID(Doc.ACCTTYPE_V_Liability_Services, as);
-			
+			//  Liability       DR
+			int payables_ID = getValidCombination_ID (Doc.ACCTTYPE_V_Liability, as);
+			int payablesServices_ID = getValidCombination_ID (Doc.ACCTTYPE_V_Liability_Services, as);
 			if (m_allLinesItem || !as.isPostServices() 
 				|| payables_ID == payablesServices_ID)
 			{

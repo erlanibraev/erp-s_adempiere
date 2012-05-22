@@ -1137,4 +1137,20 @@ public class DocLine
 		return sb.toString();
 	}	//	toString
 
+	/**
+	 * 	Get A_Asset_ID
+	 *	@return Asset
+	 */
+	public int getA_Asset_ID()
+	{
+		int index = p_po.get_ColumnIndex("A_Asset_ID");
+		if (index != -1)
+		{
+			Integer ii = (Integer)p_po.get_Value(index);
+			if (ii != null)
+				return ii.intValue();
+		}
+		return 0;
+	}	//	getA_Asset_ID
+
 }	//	DocumentLine

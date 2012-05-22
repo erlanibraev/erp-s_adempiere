@@ -88,7 +88,6 @@ public class Import1C {
 	private Map<String, List<String>> Operation  = new HashMap<String, List<String>>();
 	private String sRes1 = new String(); 
 	private String sRes2 = new String(); 
-	private Properties pJournalBatch = new Properties();
 
 	/** Set change PO			*/
 	boolean isChanged= false;
@@ -744,7 +743,43 @@ public class Import1C {
 					        			         childTag.getAttributes().item(n).getNodeValue().trim());}
 				        	lAttrVal.add(childAttrVal);  
 			        	}
-			        	if ("Y".equals(p_param.getProperty("GL"))) import1CGL(trxName, mTags[2]);
+			        	if ("Y".equals(p_param.getProperty("GL"))) {
+			        		if ((lAttrVal.size()>1)&&(lAttrVal.get(0).getProperty(cDocDate)!=null)) {
+			        			Properties At = lAttrVal.get(0);
+			        			StringBuffer sDocNo = new StringBuffer();
+			        			int iDocType = 0;
+			        			DateFormat formatter = new SimpleDateFormat("dd.MM.yy");
+			        			Date date = (Date)formatter.parse(At.getProperty(cDocDate));
+			        			java.sql.Timestamp DateAcct = new Timestamp(date.getTime());
+                                int ii;  
+			        			for(ii=0;ii<3;ii++) {
+			        				sDocNo.setLength(0);
+			        				sDocNo.append("ERP-20"+At.getProperty(cDocDate).substring(6,8)
+			        						+At.getProperty(cDocDate).substring(3,5));
+			        				switch (ii) {
+			        					case 0: iDocType = 1000049; sDocNo.append("A"); break; 
+			        					case 1: iDocType = 1000048; sDocNo.append("C"); break;
+			        					case 2: iDocType = 1000047; sDocNo.append("O"); break;
+			        				}
+			        				//StringBuffer sql = new StringBuffer ();
+			           	 			sql = "SELECT GL_JournalBatch_ID FROM GL_JournalBatch "
+			           	 					+ " WHERE DocumentNo = "+ "'"+sDocNo+"'";
+			           	 			if (SingleSQLSelect(sql.toString())) continue; 
+			           	 			MJournalBatch perbatch = new MJournalBatch (ctx, 0, null);
+			           	 			perbatch.setClientOrg(AD_Client_ID, AD_Org_ID);
+			           	 			perbatch.setDocumentNo (sDocNo.toString());
+			           	 			perbatch.setDescription("Import from 1C.");
+			           	 			perbatch.setC_DocType_ID(iDocType);
+			           	 			perbatch.setGL_Category_ID (1000002);
+			           	 			perbatch.setPostingType("A");
+			           	 			perbatch.setDateAcct(DateAcct);
+			           	 			perbatch.setDateDoc (DateAcct);
+			           	 			perbatch.setC_Currency_ID(341);
+			           	 			perbatch.save();
+			        			}
+			        			import1CGL(trxName, mTags[2]); 
+			        		 }
+			        	}
 			        }
 			        lAttrVal.clear();
   	      	  	}	
@@ -1720,68 +1755,66 @@ public class Import1C {
 			return;
 		
 //********** batch
-		StringBuffer sDocNum = new StringBuffer("ERP-"
-			+"20"+AttrVal.getProperty(cDocDate).substring(6,8)
-			+AttrVal.getProperty(cDocDate).substring(3,5));
+		StringBuffer sDocNum = new StringBuffer();;
+
+		StringBuffer sql = new StringBuffer ();
+		int i=0;
 		int C_DocType_ID = 0;
+		
+		sDocNum.setLength(0);
+		sDocNum.append("ERP-20"+AttrVal.getProperty(cDocDate).substring(6,8)
+		      +AttrVal.getProperty(cDocDate).substring(3,5));
+		C_DocType_ID = 0;
 		StringBuffer sPriDocNum = new StringBuffer("");
+		String sSuf = null;
 		sPriDocNum.setLength(0);
 		if ((Advance.get(AttrVal.getProperty(cID))!=null)&&
 			   (Advance.get(AttrVal.getProperty(cID)).get(1)!=null)) {
 			sPriDocNum.append(Advance.get(AttrVal.getProperty(cID)).get(1)); 
-			C_DocType_ID = 1000049; sDocNum.append("A");} 
+			C_DocType_ID = 1000049; sSuf = "A";} 
 		else if ((Closing.get(AttrVal.getProperty(cID))!=null)&&
 				(Closing.get(AttrVal.getProperty(cID)).get(1)!=null)) {
 			sPriDocNum.append(Closing.get(AttrVal.getProperty(cID)).get(1));
-			C_DocType_ID = 1000048; sDocNum.append("C");}
+			C_DocType_ID = 1000048; sSuf = "C";}
 		else if ((Operation.get(AttrVal.getProperty(cID))!=null)&&
 				(Operation.get(AttrVal.getProperty(cID)).get(1)!=null)) {
 			sPriDocNum.append(Operation.get(AttrVal.getProperty(cID)).get(1));
-			C_DocType_ID = 1000047; sDocNum.append("O");
+			C_DocType_ID = 1000047; sSuf = "O";
 		}	   	
-
-		//if (!"ERP-011".equals(sPriDocNum.toString())) return;
+		sDocNum.append(sSuf);
+		
+		//if (!"ERP-001".equals(sPriDocNum.toString())) return;
 		int iJBID = 0;
-		StringBuffer sql = new StringBuffer ();
-		if (pJournalBatch.getProperty(sDocNum.toString())!=null)
-				iJBID = Integer.valueOf(pJournalBatch.getProperty(sDocNum.toString()));
-        if (iJBID < 1 ) {  
-        	 sql.append("SELECT GL_JournalBatch_ID FROM GL_JournalBatch "
+		sql.setLength(0);
+        sql.append("SELECT GL_JournalBatch_ID FROM GL_JournalBatch "
         					+ " WHERE DocumentNo = "+ "'"+sDocNum+"'");
-        	if (SingleSQLSelect(sql.toString())) iJBID = Integer.valueOf(sRes1);
+        if (SingleSQLSelect(sql.toString())) iJBID = Integer.valueOf(sRes1);
+        else {
+			Log.log(Level.SEVERE, "Batch not found: "+sDocNum);
+        	return;
         }
+        
 		if (iJBID<0) iJBID = 0;
-		DateFormat formatter = new SimpleDateFormat("dd.MM.yy");
-		Date date = (Date)formatter.parse(AttrVal.getProperty(cDocDate));
-		java.sql.Timestamp DateAcct = new Timestamp(date.getTime());
 
-		MJournalBatch batch = new MJournalBatch (ctx, iJBID, sTrxName);
-		batch.setClientOrg(AD_Client_ID, AD_Org_ID);
-		batch.setDocumentNo (sDocNum.toString());
-		batch.setDescription("Import from 1C. "+AttrVal.getProperty("Description"));
-		batch.setC_DocType_ID(C_DocType_ID);
-		batch.setGL_Category_ID (1000002);
-		batch.setPostingType("A");
-		batch.setDateAcct(DateAcct);
-		batch.setDateDoc (DateAcct);
-		batch.setC_Currency_ID(341);
-		if (!batch.save())
-			Log.log(Level.SEVERE, "Batch not saved");
-		if (pJournalBatch.getProperty(sDocNum.toString())==null)
-			pJournalBatch.setProperty(sDocNum.toString(), 
-					String.valueOf(batch.getGL_JournalBatch_ID()));
+		MJournalBatch batch = new MJournalBatch (ctx, iJBID, null);
 //************ batch
 
 //************ journal
 		int iJID = 0;
 		sql.setLength(0);
 		sql.append("SELECT GL_Journal_ID FROM GL_Journal "
-  	      + " WHERE DocumentNo = "+"'"+ sPriDocNum+"'"
-  	      + " AND  GL_JournalBatch_ID = "+ batch.getGL_JournalBatch_ID());
+  	      + " WHERE DocumentNo = "+"'"+ sPriDocNum+"'");
 		if (SingleSQLSelect(sql.toString())) 
 		   iJID = Integer.valueOf(sRes1);
+		else {
+			sql.setLength(0);
+			sql.append("SELECT GL_Journal_ID FROM GL_Journal "
+	  	      + " WHERE DocumentNo = "+"'"+ sPriDocNum+"'");
+	  		if (SingleSQLSelect(sql.toString())) 
+	  			sPriDocNum.append(sSuf);
+		}
 		if (iJID<0) iJID = 0;
-		MJournal journal = new MJournal (ctx, iJID, sTrxName);
+		MJournal journal = new MJournal (ctx, iJID, null);
 		journal.setGL_JournalBatch_ID(batch.getGL_JournalBatch_ID());
 		journal.setClientOrg(AD_Client_ID, AD_Org_ID);
 		//
@@ -1796,18 +1829,19 @@ public class Import1C {
 		//
 		journal.setCurrency (batch.getC_Currency_ID(), 114, new BigDecimal("1"));
 		//
-		//journal.setC_Period_ID(batch.getC_Period_ID());
+		journal.setC_Period_ID(batch.getC_Period_ID());
 		journal.setDateAcct(batch.getDateAcct());		//	sets Period if not defined
 		journal.setDateDoc (batch.getDateDoc());
 		//
 		if (!journal.save())
 		{
-			Log.log(Level.SEVERE, "Journal not saved");
-		} System.out.println(batch.getDocumentNo()+ " " +journal.getDocumentNo());
+			Log.log(Level.SEVERE, "Journal not saved - "+batch.getDocumentNo()+ " " +journal.getDocumentNo());
+			return;
+		} 
 		
 
 //************ Lines		
-		int i=0;
+		i=0;
 		int iBDR, iBDDS, iDS;
 		for (i=0;i<lAttrVal.size()-1;i++) {
 			Properties childAttrVal = lAttrVal.get(i+1);
@@ -1826,7 +1860,7 @@ public class Import1C {
 			if (SingleSQLSelect(sql.toString()))
 			    iJLID = Integer.valueOf(sRes1);
 			MJournalLine line;
-			if (iJLID>0) line = new MJournalLine (ctx,iJLID,sTrxName);
+			if (iJLID>0) line = new MJournalLine (ctx,iJLID,null);
 			else line = new MJournalLine (journal);
 			//
 			line.setDescription(journal.getDescription());
@@ -1861,12 +1895,15 @@ public class Import1C {
 
 			iJLID = findValidCombination(sAcc,sBP);
 			if(iJLID<1) { 
-				System.out.print("Combination not found! Sum:"+
-						  	childAttrVal.getProperty("Sum")+" Line:"+ (i+1)); 
-				if ((sAcc!=null) && (Account.get(sAcc)!=null)) 
-					System.out.println(" Account: "+ Account.get(sAcc).get(2)
-							+" " +BP.get(sBP).get(2));
-				else System.out.println("");
+				System.out.print("Combination not found! "+sPriDocNum+" Sum:"+
+						  	childAttrVal.getProperty("Sum")+" Line:"+ (i+1));
+				if ((sAcc!=null) && (Account.get(sAcc)!=null)) { 
+					System.out.print(" Account: "+ Account.get(sAcc).get(2)
+							+" " +sBP);
+					if ((BP.get(sBP)!=null) && (BP.get(sBP).get(2)!=null))
+						System.out.print(", "+BP.get(sBP).get(2));
+					System.out.println("");
+				} else System.out.println("");
 				continue; 
 			}
 			line.setC_ValidCombination_ID(iJLID);
@@ -1886,7 +1923,8 @@ public class Import1C {
 			line.setQty(new BigDecimal("0"));
 			//
 			if (!line.save()) {
-				Log.log(Level.SEVERE, "Journal Line not saved");
+				Log.log(Level.SEVERE, "Journal Line "+ sPriDocNum.toString() +", "
+			      + iLine+ " not saved");
 			} 	
 			
 			iLine= (i+1)*20;
@@ -1897,7 +1935,7 @@ public class Import1C {
 	  	      + " WHERE GL_Journal_ID = "+journal.get_ID()
 	  	      + " AND line = "+ iLine);
 			if(SingleSQLSelect(sql.toString())) iJLID = Integer.valueOf(sRes1);
-			if (iJLID>0) line = new MJournalLine (ctx,iJLID,sTrxName);
+			if (iJLID>0) line = new MJournalLine (ctx,iJLID,null);
 			else line = new MJournalLine (journal);
 			//
 			line.setDescription(journal.getDescription());
@@ -1928,12 +1966,15 @@ public class Import1C {
 				(Account.get(childAttrVal.getProperty("AccountC"))!=null))
 				sAcc = childAttrVal.getProperty("AccountC");
 			iJLID = findValidCombination(sAcc,sBP);
-			if(iJLID<1) { System.out.print("Combination not found! Sum:"+
+			if(iJLID<1) { System.out.print("Combination not found!"+sPriDocNum+" Sum:"+
 					   childAttrVal.getProperty("Sum")+" Line:"+(i+1)); 
-				if ((sAcc!=null) && (Account.get(sAcc)!=null)) 
-					System.out.println(" Account: "+ Account.get(sAcc).get(2)
-							+" " +BP.get(sBP).get(2));
-				else System.out.println("");
+				if ((sAcc!=null) && (Account.get(sAcc)!=null)) { 
+					System.out.print(" Account: "+ Account.get(sAcc).get(2)
+							+" " +sBP);
+					if ((BP.get(sBP)!=null) && (BP.get(sBP).get(2)!=null))
+						System.out.print(", "+BP.get(sBP).get(2));
+					System.out.println("");
+				} else System.out.println("");
 				continue; 
 			}
 			line.setC_ValidCombination_ID(iJLID);
