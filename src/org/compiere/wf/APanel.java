@@ -1655,12 +1655,6 @@ public final class APanel extends CPanel
 			return;
 		}
 		
-		//a.nurpiisov FI: create swift file	{
-		if(cmd.equals("Swift")){
-			org.erps.ErpsCreateSwift.createSwift(m_ctx);
-		}
-		//}
-		
 		//  Problem: doubleClick detection - can't disable button as clicking button may change button status
 		if (!cmd.equals(aShowAllWindow.getName()))
 			setBusy (true, true);
