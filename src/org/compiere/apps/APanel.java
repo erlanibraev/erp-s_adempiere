@@ -1641,6 +1641,7 @@ public final class APanel extends CPanel
 	 */
 	public void actionPerformed (ActionEvent e)
 	{
+
 		log.info(e.getActionCommand() + " - " + e.getModifiers());
 		//	+ " - " + new Timestamp(e.getWhen()) + " " + isUILocked());
 		if (m_disposing || isUILocked())
@@ -1655,7 +1656,7 @@ public final class APanel extends CPanel
 			return;
 		}
 		
-		//a.nurpiisov FI: create swift file	{
+		//a.nurpiisov FI: create swift file	2{
 		if(cmd.equals("Swift")){
 			org.erps.ErpsCreateSwift.createSwift(m_ctx);
 		}

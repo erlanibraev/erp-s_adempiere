@@ -5,6 +5,8 @@ import org.compiere.util.Env;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -17,7 +19,7 @@ import java.sql.SQLException;
 
 public class ErpsCreateSwift {
 	public static int createSwift(Properties ctx){
-
+		System.out.println("create swift");
 		try{
 			final JFileChooser fc = new JFileChooser();
 			JList list = new JList();
@@ -128,7 +130,12 @@ public class ErpsCreateSwift {
 				out.write(":20:REFERENCE"); out.write("\r\n");
 				
 				//2011-12-30 00:00:00
-				if(dateacct!=null) dateacct = dateacct.substring(2, 4) + dateacct.substring(5, 7) + dateacct.substring(8,10);  
+				if(dateacct!=null) dateacct = dateacct.substring(2, 4) + dateacct.substring(5, 7) + dateacct.substring(8,10); 
+				if(payamt!=null || payamt.equals("")){
+					BigDecimal bg = new BigDecimal(payamt).setScale(2,BigDecimal.ROUND_UP);
+					payamt = bg.toPlainString();
+				}
+				
 				out.write(":32A:"+ dateacct + currency + payamt); out.write("\r\n");
 				out.write(":50:/D/KZ839261501140044000"); out.write("\r\n");
 				out.write("/NAME/TOO ERP -Service "+'"'+"KazTransCom"+'"'); out.write("\r\n");				
