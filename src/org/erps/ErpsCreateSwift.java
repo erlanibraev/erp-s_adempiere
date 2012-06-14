@@ -133,7 +133,7 @@ public class ErpsCreateSwift {
 				if(dateacct!=null) dateacct = dateacct.substring(2, 4) + dateacct.substring(5, 7) + dateacct.substring(8,10); 
 				if(payamt!=null || payamt.equals("")){
 					BigDecimal bg = new BigDecimal(payamt).setScale(2,BigDecimal.ROUND_UP);
-					payamt = bg.toPlainString();
+					payamt = bg.toPlainString().replace(".", ",");
 				}
 				
 				out.write(":32A:"+ dateacct + currency + payamt); out.write("\r\n");
