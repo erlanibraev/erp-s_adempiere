@@ -35,6 +35,7 @@ import org.compiere.model.MLandedCostAllocation;
 import org.compiere.model.MTax;
 import org.compiere.model.ProductCost;
 import org.compiere.model.X_A_Asset;
+import org.compiere.model.X_A_Asset_Acct;
 import org.compiere.model.X_A_Asset_Addition;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -499,31 +500,36 @@ public class Doc_Invoice extends DocMy
 			for (int i = 0; i < p_lines.length; i++)
 			{
 				DocLine line = p_lines[i];
-				//  Asset          DR
-				StringBuffer sql = new StringBuffer (
-						"SELECT b.A_Asset_Acct FROM C_InvoiceLine as a"
-						 + " LEFT JOIN A_Asset_Acct as b ON"
-						 + " (b.A_Asset_ID = a.A_Asset_ID)" 
-						 + " WHERE C_InvoiceLine_id = "+ line.get_ID()); 
-				int no = DB.getSQLValue(getTrxName(), sql.toString());
-				if (no>0) { 	
-					MAccount acct = MAccount.get (as.getCtx(), no);
-					fact.createLine(line, acct,
+
+//************************  Asset          DR *************************************
+				
+				if (line.getA_Asset_ID() > 0) 
+				{
+				    // Adding info for Asset Card
+					StringBuffer sql = new StringBuffer ("SELECT A_Asset_Acct FROM A_Asset_Acct "
+						 + " WHERE A_Asset_ID = "+ line.getA_Asset_ID()); 
+				    int no = DB.getSQLValue(getTrxName(), sql.toString());
+				    if (no>0) { 	
+				    	MAccount acct = MAccount.get (as.getCtx(), no);
+				    	fact.createLine(line, acct,
 							getC_Currency_ID(), line.getAmtSource(), null);
-					X_A_Asset asset = new X_A_Asset (getCtx(), line.getA_Asset_ID(), getTrxName());
-					asset.setA_Asset_CreateDate(getDateAcct());
-					asset.setA_QTY_Current(line.getQty());
-					asset.setA_QTY_Original(line.getQty());
-					asset.save();
+				    	X_A_Asset asset = new X_A_Asset (getCtx(), line.getA_Asset_ID(), getTrxName());
+				    	asset.setA_Asset_CreateDate(getDateAcct());
+				    	asset.setA_QTY_Current(line.getQty());
+				    	asset.setA_QTY_Original(line.getQty());
+				    	asset.save(); 
+				    }
 					
-					sql = new StringBuffer (
-							"SELECT A_Asset_Addition_ID FROM A_Asset_Addition "
+					// Adding Asset Posting
+				    sql.setLength(0);
+					sql.append("SELECT A_Asset_Addition_ID FROM A_Asset_Addition "
 							 + " WHERE C_InvoiceLine_id = "+ line.get_ID());
 					no = 0;
 					no = DB.getSQLValue(getTrxName(), sql.toString());
 
 					X_A_Asset_Addition assetadd = new X_A_Asset_Addition (getCtx(), no, getTrxName());
-					assetadd.setA_Asset_ID(asset.getA_Asset_ID());
+					assetadd.setAD_Org_ID(line.getAD_Org_ID());
+					assetadd.setA_Asset_ID(line.getA_Asset_ID());
 					assetadd.setAssetValueAmt(line.getAmtSource());
 					assetadd.setA_SourceType("INV");
 					assetadd.setA_CapvsExp("Exp");
@@ -535,9 +541,15 @@ public class Doc_Invoice extends DocMy
 					assetadd.setDescription(line.getDescription());
 					assetadd.setA_QTY_Current(line.getQty());
 					assetadd.setPostingType("A");
-					assetadd.save();					
+					assetadd.setDateAcct(line.getDateAcct());
+					assetadd.save();
+					
+					// Adding Asset Balances
+					
 					continue; 
 				} else log.log(Level.SEVERE, "Asset has not Accounting Setup");
+//****************************** Asset ********************************************
+ 				
  				boolean landedCost = landedCost(as, fact, line, true);
 				if (landedCost && as.isExplicitCostAdjustment())
 				{
