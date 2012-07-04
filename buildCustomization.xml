@@ -2,12 +2,11 @@
     <description>
     	Settings from Vladimir Sokolov
     </description>
-  <!-- define properties for this build -->
+	<!-- define properties for this build -->
   <property file="buildCustomization.properties"/>
   <property name="src" location="src"/>
   <property name="srcWeb" location="zkwebui"/>
-  <property name="webui" value="WEB-INF/classes/org/adempiere/webui"/>
-  <property name="srczk" location="srczk"/>
+  <property name="srcZk" location="srcZk"/>
   <property name="buildWeb" location="build/WEB-INF/classes"/>	
   <property name="build" location="build"/>
   <property name="buildJava" location="buildJava"/>
@@ -16,67 +15,60 @@
   <path id="lib.class.path">
      <fileset dir="${adempiere.home}/lib">
         <include name="*.jar"/>
-     	<include name="*.war"/>
      </fileset>
   </path>
   <target name="clean"
 	        description="clean up" >
-	    <!-- Delete the ${build} and ${dist} directory trees -->
+  	    <!-- Delete the ${build} and ${dist} directory trees -->
 	    <delete dir="${build}"/>
   	    <delete dir="${buildJava}"/>
   	<!-- <delete dir="${adempiere.zkCustomLibDir}"/>
   	    <delete dir="${adempiere.customLibDir}"/>  -->
   </target>
   <target name="init" depends="clean" description="inicializa">
+    <echo message="Inicializando proyecto ..."/>
     <echo message="Trunk PATH: ${adempiere.trunk}"/>
     <echo message="ADempiere home: ${adempiere.home}"/>
   	<echo message="ZK Deploy dir: ${adempiere.zkCustomLibDir}"/>
   	<echo message="Zk Jar file dir: ${adempiere.zkCustomLibDir}/${adempiere.zkCustomJarFile}"/>
   	<echo message="Deploy dir Java: ${adempiere.customLibDir}"/>
   	<echo message="Jar file dir: ${adempiere.customLibDir}/${adempiere.customJarFile}"/>
-    <!-- Create the timestamp -->
+  	<!-- Create the timestamp -->
     <tstamp/>
   	<!-- Create directory del build -->
   	    <mkdir dir="${buildJava}"/>
-    <!-- Create directory del build para Web-->
+  	<!-- Create directory del build para Web-->
     <mkdir dir="${build}"/>
-  	<mkdir dir="${build}/${webui}"/>
-  	  	<copy todir="${buildJava}">
-  	  	  	     	<fileset dir="${src}">
-  	  	  	  	       <include name="**/*.png"/>
-  	  	  	     	   <exclude name="**/*.java"/>
-  	  	  	  		 </fileset>
-  	  	  	</copy>
-  	  	<copy todir="${build}/${webui}">
-  	  	     	<fileset dir="${srcWeb}/${webui}">
-  	  	  	       <include name="**/*"/>
+  	<copy todir="${buildJava}">
+  	  	     	<fileset dir="${src}">
+  	  	  	       <include name="**/*.png"/>
+  	  	     	   <exclude name="**/*.java"/>
   	  	  		 </fileset>
   	  	</copy>
+  	<mkdir dir="${build}/WEB-INF/classes"/>
   </target>
 
-  <target name="compile" depends="init" description="compiling source code ">
-  	
+  <target name="compile" depends="init" description="compilando codigo fuente ">
   	<!-- Compile the java code (ZK) from ${srcZk} to ${buildWeb)-->
-  	    <javac srcdir="${srczk}" destdir="${buildWeb}" includeantruntime="false" encoding="UTF-8">
-  	      <classpath refid="lib.class.path"/>
-  	    </javac>
-  	
-       <!-- Compile the java code (base) from ${src} to ${build_java}  -->
     <javac srcdir="${src}" destdir="${buildJava}" includeantruntime="false" encoding="UTF-8">
       <classpath refid="lib.class.path"/>
     </javac>
     
+  	<!-- Compile the java code (base) from ${src} to ${build_java}  -->
+  	    <javac srcdir="${srcZk}" destdir="${buildWeb}" includeantruntime="false" encoding="UTF-8">
+  	      <classpath refid="lib.class.path"/>
+  	    </javac>
   </target>
 
-  <target name="dist" depends="compile" description="generate jar final" >
-    <!-- Create directory for deploying the jar -->
+  <target name="dist" depends="compile" description="genera el jar final" >
+  	<!-- Create directory for deploying the jar -->
   	<mkdir dir="${adempiere.customLibDir}"/>
   	<!-- Create directory for deploying the jar of ZK -->
     <mkdir dir="${adempiere.zkCustomLibDir}"/>
   	
   	<!-- create file. jar file java-only  -->
   	<jar jarfile="${adempiere.customLibDir}/${adempiere.customJarFile}" basedir="${buildJava}"/>
-  	 <!-- create file. jar file of zk-->
+  	<!-- create file. jar file of zk-->
     <jar jarfile="${adempiere.zkCustomLibDir}/${adempiere.zkCustomJarFile}" basedir="${build}"/>
   	
   </target>

@@ -31,7 +31,7 @@ public class ErpsCreateSwift {
 				String FileName = fc.getSelectedFile().getAbsolutePath() + "/Swift.txt";
 				File file = new File(FileName);//fc.getSelectedFile();
 				fos = new FileOutputStream(file);
-				out = new OutputStreamWriter(fos, "CP866");
+				out = new OutputStreamWriter(fos, "UTF8");//"CP866");
 				
 				// lookup prefix
 				Properties pro = Env.getCtx();
@@ -54,31 +54,52 @@ public class ErpsCreateSwift {
 				String C_Payment_ID = Env.getContext(ctx, value);
 				
 				String sql = 
-						" select	" + 
-						"	org.name as orgname " +
-						"	,bp.name " +
-						" 	,documentno " +
-						"	,bp.rnn as rnn1 " +
-						"	,(select name from c_bpartner where c_bpartner_id = cast(main.directorsignaturepayment as numeric)) director " +
-						"	,(select name from c_bpartner where c_bpartner_id = cast(main.chiefaccontantsignaturepayment as numeric)) chiefacc " +
-						" 	,main.payamt " +
-						"   ,main.description " +
-						"	,bp.resident " +
-						" 	,(select eco_sector_code from erps_eco_sector_code where erps_eco_sector_code_id = bp.erps_eco_sector_code_id) sector " +
-						"	,(select cod_naznach_plateja from erps_cod_naznach_plateja where erps_cod_naznach_plateja_id = main.erps_cod_naznach_plateja_id) kpn " +						
-						"	,dateacct " +
-						"	,(select iso_code from c_currency where c_currency_id = main.c_currency_id) currency " +
-						"	,(select accountno from c_bankaccount where c_bankaccount_id = main.c_bankaccount_id) bankacc " +	
-						"	,(select routingno from c_bank as b " +
-						"			inner join c_bankaccount as ba on ba.c_bank_id = b.c_bank_id " +
-						"			where c_bankaccount_id = main.c_bankaccount_id) routingno " +
-						
-						
-						" from c_payment as main " +
-						"	left join ad_org as org on org.ad_org_id = main.ad_org_id " +
-						"	left join c_bpartner bp on  bp.c_bpartner_id = main.c_bpartner_id " +
-
-						" where c_payment_id = ? ";//1000257 ";
+					" select " +		
+					" org.name as orgname " + 	
+					" ,bp.name " +  	
+					" ,documentno " + 	
+					" ,bp.fi_tin as rnn1 " + 	
+					" ,(select name from c_bpartner where c_bpartner_id = cast(main.fi_chiefsignature as numeric)) director " + 	
+					" ,(select name from c_bpartner where c_bpartner_id = cast(main.fi_chiefaccountantsignature as numeric)) chiefacc " +  	
+					" ,main.payamt " +
+					" ,main.description " +
+					" ,substr(fi_code, 1,1) resident " +	
+					" ,substr(fi_code, 2,1) sector " +
+					" ,bp.description as kpn " +
+					" ,dateacct " + 	
+					" ,(select iso_code from c_currency where c_currency_id = main.c_currency_id) currency " + 	
+					" ,(select accountno from c_bankaccount where c_bankaccount_id = main.c_bankaccount_id) bankacc " + 	
+					" ,(select routingno from c_bank as b inner join c_bankaccount as ba on ba.c_bank_id = b.c_bank_id where c_bankaccount_id = main.c_bankaccount_id) routingno " +  
+					" from c_payment as main " + 	
+					" left join ad_org as org on org.ad_org_id = main.ad_org_id " + 	
+					" left join c_bpartner bp on  bp.c_bpartner_id = main.c_bpartner_id " + 
+					" left join fi_codebeneficiary as cb on cb.fi_codebeneficiary_id = bp.fi_codebeneficiary_id " +
+					" where c_payment_id = ? ";//1000003						
+//						" select	" + 
+//						"	org.name as orgname " +
+//						"	,bp.name " +
+//						" 	,documentno " +
+//						"	,bp.rnn as rnn1 " +
+//						"	,(select name from c_bpartner where c_bpartner_id = cast(main.directorsignaturepayment as numeric)) director " +
+//						"	,(select name from c_bpartner where c_bpartner_id = cast(main.chiefaccontantsignaturepayment as numeric)) chiefacc " +
+//						" 	,main.payamt " +
+//						"   ,main.description " +
+//						"	,bp.resident " +
+//						" 	,(select eco_sector_code from erps_eco_sector_code where erps_eco_sector_code_id = bp.erps_eco_sector_code_id) sector " +
+//						"	,(select cod_naznach_plateja from erps_cod_naznach_plateja where erps_cod_naznach_plateja_id = main.erps_cod_naznach_plateja_id) kpn " +						
+//						"	,dateacct " +
+//						"	,(select iso_code from c_currency where c_currency_id = main.c_currency_id) currency " +
+//						"	,(select accountno from c_bankaccount where c_bankaccount_id = main.c_bankaccount_id) bankacc " +	
+//						"	,(select routingno from c_bank as b " +
+//						"			inner join c_bankaccount as ba on ba.c_bank_id = b.c_bank_id " +
+//						"			where c_bankaccount_id = main.c_bankaccount_id) routingno " +
+//						
+//						
+//						" from c_payment as main " +
+//						"	left join ad_org as org on org.ad_org_id = main.ad_org_id " +
+//						"	left join c_bpartner bp on  bp.c_bpartner_id = main.c_bpartner_id " +
+//
+//						" where c_payment_id = ? ";//1000257 ";
 
 				PreparedStatement pstmt = null;
 				ResultSet rs = null;
