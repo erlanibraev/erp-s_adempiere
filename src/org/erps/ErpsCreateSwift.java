@@ -63,16 +63,19 @@ public class ErpsCreateSwift {
 					" ,(select name from c_bpartner where c_bpartner_id = cast(main.fi_chiefaccountantsignature as numeric)) chiefacc " +  	
 					" ,main.payamt " +
 					" ,main.description " +
-					" ,substr(fi_code, 1,1) resident " +	
-					" ,substr(fi_code, 2,1) sector " +
-					" ,bp.description as kpn " +
+					" ,substr(cb.fi_code, 1,1) resident " +	
+					" ,substr(cb.fi_code, 2,1) sector " +
+					" ,sc.fi_code as kpn " +
 					" ,dateacct " + 	
 					" ,(select iso_code from c_currency where c_currency_id = main.c_currency_id) currency " + 	
 					" ,(select accountno from c_bankaccount where c_bankaccount_id = main.c_bankaccount_id) bankacc " + 	
 					" ,(select routingno from c_bank as b inner join c_bankaccount as ba on ba.c_bank_id = b.c_bank_id where c_bankaccount_id = main.c_bankaccount_id) routingno " +  
+					" ,(select swiftcode from c_bank as b inner join c_bankaccount as ba on ba.c_bank_id = b.c_bank_id where c_bankaccount_id = main.c_bankaccount_id) swift  " +
+					" ,(select ba.accountno from c_bank as b inner join c_bankaccount as ba on ba.c_bank_id = b.c_bank_id where c_bankaccount_id = main.c_bankaccount_id) account2  " +
 					" from c_payment as main " + 	
 					" left join ad_org as org on org.ad_org_id = main.ad_org_id " + 	
 					" left join c_bpartner bp on  bp.c_bpartner_id = main.c_bpartner_id " + 
+					" left join fi_sectionOfCodeForPayment as sc on sc.fi_sectionOfCodeForPayment_id = main.fi_sectionOfCodeForPayment_id " +
 					" left join fi_codebeneficiary as cb on cb.fi_codebeneficiary_id = bp.fi_codebeneficiary_id " +
 					" where c_payment_id = ? ";//1000003						
 //						" select	" + 
@@ -119,6 +122,8 @@ public class ErpsCreateSwift {
 				String currency = null;
 				String bankacc = null;
 				String routingno = null;
+				String swift = null;
+				String accountNo2 = null;
 				
 					pstmt = DB.prepareStatement(sql, null);
 					pstmt.setInt(1, Integer.parseInt(C_Payment_ID));
@@ -141,6 +146,8 @@ public class ErpsCreateSwift {
 						currency = rs.getString("currency");
 						bankacc = rs.getString("bankacc");
 						routingno = rs.getString("routingno");
+						swift = rs.getString("swift");
+						accountNo2 = rs.getString("account2");
 					}
 
 				//write file
@@ -159,23 +166,23 @@ public class ErpsCreateSwift {
 				
 				out.write(":32A:"+ dateacct + currency + payamt); out.write("\r\n");
 				out.write(":50:/D/KZ839261501140044000"); out.write("\r\n");
-				out.write("/NAME/TOO ERP -Service "+'"'+"KazTransCom"+'"'); out.write("\r\n");				
-				out.write("/RNN/620300240882"); out.write("\r\n");
+				out.write("/NAME/АО «Национальный инфокоммуникационный холдинг «Зерде»"); out.write("\r\n");				
+				out.write("/RNN/620200331655"); out.write("\r\n");
 				
 				out.write("/CHIEF/" + (director == null ? "" : director)); out.write("\r\n");
 				out.write("/MAINBK/" + (chiefAcc == null ? "" : chiefAcc)); out.write("\r\n");
 				out.write("/IRS/1"); out.write("\r\n");
 				out.write("/SECO/7"); out.write("\r\n");		
-				out.write(":52B:195301716"); out.write("\r\n");	//old BIK
+				out.write(":52B:" + (swift == null ? "" : swift )); out.write("\r\n");	//old BIK
 				out.write(":57B:" + (routingno == null ? "" : routingno)); out.write("\r\n");	//new BIK
-				out.write(":59:KZ299261802148808000"); out.write("\r\n");	//fix				
+				out.write(":59:" + (accountNo2 == null ? "" : accountNo2)); out.write("\r\n");	//fix				
 				out.write("/NAME/" + (name == null ? "" : name)); out.write("\r\n");
 				out.write("/RNN/" + (rnn1 == null ? "" : rnn1)); out.write("\r\n");
-				out.write("/IRS/" + (resident2.equals("Y") ? "1" : "2")); out.write("\r\n"); 
+				out.write("/IRS/" + (resident2 == null ? "" : resident2)); out.write("\r\n"); 
 				out.write("/SECO/" + (sector2 == null ? "" : sector2)); out.write("\r\n");
 				
 				out.write(":70:/NUM/"+(documentNo == null ? "" : documentNo)); out.write("\r\n");	//fix
-				out.write("/DATE/00000"); out.write("\r\n");
+				out.write("/DATE/"+(dateacct == null ? "" : dateacct)); out.write("\r\n");
 				out.write("/VO/01"); out.write("\r\n");	//fix
 				out.write("/SEND/07"); out.write("\r\n");	//fix
 				out.write("/KNP/" + (kpn == null ? "" : kpn)); out.write("\r\n");
