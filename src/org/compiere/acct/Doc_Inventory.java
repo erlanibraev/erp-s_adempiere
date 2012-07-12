@@ -157,11 +157,20 @@ public class Doc_Inventory extends Doc
 			{
 				// fix ------------------------
 				String sql = 
-						" select pricelist " + 
-						" from adempiere.m_productprice as a " +
-						" ,adempiere.m_costdetail as b " +
-						"where b.m_product_id = a.m_product_id " +
-						"and m_costdetail_id = ?";
+						" select a.currentcostprice " +
+						" from adempiere.m_cost as a--adempiere.m_productprice as a " +  
+						" ,adempiere.m_inventoryline as b " +
+						" where b.m_product_id = a.m_product_id " +
+						" and b.m_attributesetinstance_id  = a.m_attributesetinstance_id " +
+						" and b.m_inventoryline_id = ? " +
+						" and a.isactive = 'Y' " +
+						" and currentcostprice > 0 ";						
+//						" select pricelist " + 
+//						" from adempiere.m_productprice as a " +
+//						" ,adempiere.m_costdetail as b " +
+//						"where b.m_product_id = a.m_product_id " +
+//						"and m_costdetail_id = ?";
+						
 				
 				PreparedStatement pstmt = null;
 				ResultSet rs = null;
@@ -172,7 +181,6 @@ public class Doc_Inventory extends Doc
 					rs = pstmt.executeQuery();
 					if (rs.next())
 					{
-						System.out.println("alm");
 						costs = rs.getBigDecimal("pricelist");
 					}
 				}catch(Exception e){
