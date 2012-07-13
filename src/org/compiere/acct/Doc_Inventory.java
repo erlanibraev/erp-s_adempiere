@@ -155,42 +155,8 @@ public class Doc_Inventory extends Doc
 			// end MZ
 			if (costs == null || costs.signum() == 0)
 			{
-				// fix ------------------------
-				String sql = 
-						" select a.currentcostprice " +
-						" from adempiere.m_cost as a--adempiere.m_productprice as a " +  
-						" ,adempiere.m_inventoryline as b " +
-						" where b.m_product_id = a.m_product_id " +
-						" and b.m_attributesetinstance_id  = a.m_attributesetinstance_id " +
-						" and b.m_inventoryline_id = ? " +
-						" and a.isactive = 'Y' " +
-						" and currentcostprice > 0 ";						
-//						" select pricelist " + 
-//						" from adempiere.m_productprice as a " +
-//						" ,adempiere.m_costdetail as b " +
-//						"where b.m_product_id = a.m_product_id " +
-//						"and m_costdetail_id = ?";
-						
-				
-				PreparedStatement pstmt = null;
-				ResultSet rs = null;
-				try{
-					pstmt = DB.prepareStatement(sql, null);
-					pstmt.setInt(1, line.get_ID());
-					
-					rs = pstmt.executeQuery();
-					if (rs.next())
-					{
-						costs = rs.getBigDecimal("pricelist");
-					}
-				}catch(Exception e){
-					System.out.println(e.toString());
-				}
-				//-------------------------------
-				if (costs == null || costs.signum() == 0){
 					p_Error = "No Costs for " + line.getProduct().getName();
 					return null;
-				}
 			}
 			//  Inventory       DR      CR
 			dr = fact.createLine(line,
