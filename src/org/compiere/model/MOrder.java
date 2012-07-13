@@ -239,6 +239,43 @@ public class MOrder extends X_C_Order implements DocAction
 		else
 			setC_DocTypeTarget_ID();
 	}	//	MOrder
+	
+	public MOrder (Merpscontract contract, boolean IsSOTrx, String DocSubTypeSO)
+	{
+		this (contract.getCtx(), 0, contract.get_TrxName());
+		setAD_Client_ID(contract.getAD_Client_ID());
+		setAD_Org_ID(contract.getAD_Org_ID());
+		//setC_Campaign_ID(contract.getC_Campaign_ID()); // ???
+		setSalesRep_ID(contract.getSalesRep_ID());
+		//
+		setC_Project_ID(contract.geterps_contract_ID()); // ???
+			setDescription(contract.getName());
+		Timestamp ts = contract.getDateContract();
+		if (ts != null)
+			setDateOrdered (ts);
+		ts = contract.getDateFinish();
+		if (ts != null)
+			setDatePromised (ts);
+		//
+		setC_BPartner_ID(contract.getC_BPartner_ID());
+		setC_BPartner_Location_ID(contract.getC_BPartner_Location_ID());
+		setAD_User_ID(contract.getAD_User_ID());
+		//
+		setM_Warehouse_ID(contract.getM_Warehouse_ID());
+		setM_PriceList_ID(contract.getM_PriceList_ID());
+		setC_PaymentTerm_ID(contract.getC_PaymentTerm_ID());
+		//
+		setIsSOTrx(IsSOTrx);
+		if (IsSOTrx)
+		{
+			if (DocSubTypeSO == null || DocSubTypeSO.length() == 0)
+				setC_DocTypeTarget_ID(DocSubTypeSO_OnCredit);
+			else
+				setC_DocTypeTarget_ID(DocSubTypeSO);
+		}
+		else
+			setC_DocTypeTarget_ID();
+	}	//	MOrder
 
 	/**
 	 *  Load Constructor
