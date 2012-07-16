@@ -52,48 +52,12 @@ public class ContractGenOrder extends SvrProcess {
 			sb1.append(" - ").append(fromConract.getDescription());
 		ol1.setDescription(sb1.toString());
 		ol1.setPrice(fromConract.getPlannedAmt());
-		BigDecimal Qty = new BigDecimal("1");
-		ol1.setQty(Qty);
-		ol1.setTax();
+		ol1.setQty(new BigDecimal("1"));
+		ol1.setC_Tax_ID(fromConract.getC_Tax_ID());
 		if (!ol1.save())
 			log.log(Level.SEVERE, "doIt - Lines not generated");
 		
-		//		***	Lines ***
-		int count = 0;
-			
-		//	Service Project	
-		if (Merpscontract.PROJECTCATEGORY_ServiceChargeProject.equals(fromConract.getProjectCategory()))
-		{
-			/** @todo service contract invoicing */
-			throw new Exception("Service Charge Contracts are on the TODO List");
-		}//	Service Lines
-		else	//	Order Lines
-		{
-			Merpscontractline[] lines = fromConract.getLines();
-			for (int i = 0; i < lines.length; i++)
-			{
-				MOrderLine ol = new MOrderLine(order);
-				//ol.setLine(lines[i].getLine());   // ???
-				ol.setDescription(lines[i].getDescription()+" werwerwerwe");
-				//
-				//ol.setM_Product_ID(lines[i].getM_Product_ID(), true);
-				ol.setPrice();
-				ol.setQty(new BigDecimal(1));
-				if (lines[i].getPlannedAmt() != null)
-					ol.setPrice(lines[i].getPlannedAmt());
-				ol.setPriceEntered(lines[i].getPlannedAmt());
-				ol.setDiscount();
-				ol.setC_Tax_ID(fromConract.getC_Tax_ID());
-				ol.setC_UOM_ID(100);
-				//ol.setTax();
-				if (ol.save())
-					count++;
-			}	//	for all lines
-			if (lines.length != count)
-				log.log(Level.SEVERE, "Lines difference - ContractLines=" + lines.length + " <> Saved=" + count);
-		}	//	Order Lines
-		
-		return null;
+		return "generation of the act is completed -> " + "@C_Order_ID@ " + order.getDocumentNo();
 	}
 	
 
