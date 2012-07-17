@@ -109,7 +109,7 @@ public class Doc_Payment extends Doc
 	public ArrayList<Fact> createFacts (MAcctSchema as)
 	{
 	
-				// V.Sokolov
+		// V.Sokolov
 				int m_GL_Category_ID = 0; 
 				String sql_ = "SELECT GL_Category_ID FROM C_DocType WHERE C_DocType_ID=?";
 				PreparedStatement pstmt = null;
@@ -153,6 +153,7 @@ public class Doc_Payment extends Doc
 				
 				//a.nurpiisov 16072012------------------{
 				boolean fix = false;
+				String doctype = null;
 				String zsql = 	" SELECT d.docbasetype, p.c_order_id, p.c_invoice_id, b.isemployee " + 
 					 	" FROM c_payment p " +
 					 	" inner join c_doctype d on d.c_doctype_id = p.c_doctype_id " +
@@ -167,7 +168,7 @@ public class Doc_Payment extends Doc
 							rsDT = pstmt.executeQuery();
 							if (rsDT.next()){
 								String isemployee = rsDT.getString(4);
-								String doctype = rsDT.getString(1);
+								doctype = rsDT.getString(1);
 								if(isemployee.equals("Y")){
 									acct = getAccount(Doc.ACCTTYPE_Employee, as);
 								}else{
@@ -210,10 +211,18 @@ public class Doc_Payment extends Doc
 						}
 						
 						if(!fix){
-							FactLine fl = fact.createLine(null, acct,
-									getC_Currency_ID(), getAmount(), null);
-							fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
-									getC_Currency_ID(), null, getAmount());
+							if(doctype.equals("APP")){
+								FactLine fl = fact.createLine(null, acct,
+										getC_Currency_ID(), getAmount(), null);
+								fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
+										getC_Currency_ID(), null, getAmount());
+							}else{
+								FactLine fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
+										getC_Currency_ID(), null, getAmount());
+								fl = fact.createLine(null, acct,
+										getC_Currency_ID(), getAmount(), null);
+
+							}
 						}
 				//}--------------------------------------
 				
