@@ -1,7 +1,17 @@
 package org.compiere.model;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.util.Properties;
+import java.util.logging.Level;
+
+import org.compiere.util.DB;
+import org.compiere.util.Env;
+
+import extend.org.compiere.CalloutContractTax;
 
 public class Merpscontractline extends X_erps_contractline {
 	
@@ -19,6 +29,51 @@ public class Merpscontractline extends X_erps_contractline {
 		super(ctx, rs, trxName);
 	}
 
+	/** Tax							*/
+	private MTax 		m_tax = null;
+	
+	@Override
+	protected boolean afterSave(boolean newRecord, boolean success) {
+	
+		String sql = "UPDATE erps_contract p SET (PlannedAmt,CommittedAmt) = " +
+				"(SELECT COALESCE(SUM(pl.PlannedAmt),0)," +
+				" COALESCE(SUM(pl.CommittedAmt),0)" +
+				" FROM erps_contractLine pl" +
+				" WHERE pl.erps_contract_id=p.erps_contract_id AND pl.IsActive='Y')" +
+				" WHERE erps_contract_ID=" + geterps_contract_ID();
+			int no = DB.executeUpdate(sql, get_TrxName());
+			if (no != 1)
+				log.log(Level.SEVERE, "updateHeader contract - #" + no);
+			
+			Merpscontract ec = new Merpscontract(getCtx(), geterps_contract_ID(), get_TrxName());
+			BigDecimal taxBaseAmt = Env.ZERO;
+			BigDecimal taxAmt = Env.ZERO;
 
+			//
+			if (m_tax == null)
+				m_tax = MTax.get(getCtx(), (Integer) ec.getC_Tax_ID());
+			
+			boolean documentLevel = m_tax.isDocumentLevel();
+			BigDecimal baseAmt = (BigDecimal) ec.getPlannedAmt();
+			taxBaseAmt = taxBaseAmt.add(baseAmt);
+			
+			//
+			if (!documentLevel)		// calculate line tax
+				taxAmt = taxAmt.add(m_tax.calculateTax(baseAmt, true, 2));
+			
+			if (taxBaseAmt == null)
+				return false;
+			
+			//	Calculate Tax
+			if (documentLevel)		//	document level
+				taxAmt =m_tax.calculateTax(taxBaseAmt, true, 2);
+			
+			ec.setTaxAmt(taxAmt);
+			//	Set Base
+			ec.setTaxBaseAmt(taxBaseAmt.subtract(taxAmt));
+			ec.saveEx();
+		
+		return true;
+	}
 
 }

@@ -37,7 +37,7 @@ public class ContractLineGenOrder extends SvrProcess {
 			throw new IllegalArgumentException("erps_contractLine_ID == 0");
 		Merpscontractline fromLine = new Merpscontractline (getCtx(), m_ContractLine_ID, get_TrxName());
 		Merpscontract fromContract = ContractGenOrder.getContract(getCtx(), fromLine.geterps_contract_ID(), get_TrxName());
-		MOrder order = new MOrder (fromContract, true, MOrder.DocSubTypeSO_OnCredit);
+		MOrder order = new MOrder (fromContract, fromLine, true, MOrder.DocSubTypeSO_OnCredit);
 		order.setDateOrdered(fromLine.getStartDate());
 		order.setDatePromised(fromLine.getEndDate());
 		order.setDescription(order.getDescription() + " - " + fromLine.getName());
@@ -53,7 +53,7 @@ public class ContractLineGenOrder extends SvrProcess {
 		//
 		ol1.setQty(fromLine.getQty());
 		ol1.setPrice(fromLine.getPlannedAmt());
-		ol1.setC_Tax_ID(fromContract.getC_Tax_ID());
+		ol1.setC_Tax_ID(fromLine.getC_Tax_ID());
 		if (!ol1.save())
 			log.log(Level.SEVERE, "doIt - Lines not generated");
 		

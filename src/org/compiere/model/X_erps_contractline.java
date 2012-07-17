@@ -33,7 +33,7 @@ public class X_erps_contractline extends PO implements I_erps_contractline, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20120713L;
+	private static final long serialVersionUID = 20120717L;
 
     /** Standard Constructor */
     public X_erps_contractline (Properties ctx, int erps_contractline_ID, String trxName)
@@ -42,6 +42,7 @@ public class X_erps_contractline extends PO implements I_erps_contractline, I_Pe
       /** if (erps_contractline_ID == 0)
         {
 			setCommittedAmt (Env.ZERO);
+			setC_Tax_ID (0);
 			seterps_contract_ID (0);
 			seterps_contractline_ID (0);
 			setIsCommitCeiling (false);
@@ -83,6 +84,26 @@ public class X_erps_contractline extends PO implements I_erps_contractline, I_Pe
       return sb.toString();
     }
 
+	/** Set Committed Amount.
+		@param CommittedAmt 
+		The (legal) commitment amount
+	  */
+	public void setCommittedAmt (BigDecimal CommittedAmt)
+	{
+		set_Value (COLUMNNAME_CommittedAmt, CommittedAmt);
+	}
+
+	/** Get Committed Amount.
+		@return The (legal) commitment amount
+	  */
+	public BigDecimal getCommittedAmt () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_CommittedAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
 	public org.compiere.model.I_C_Order getC_Order() throws RuntimeException
     {
 		return (org.compiere.model.I_C_Order)MTable.get(getCtx(), org.compiere.model.I_C_Order.Table_Name)
@@ -111,24 +132,32 @@ public class X_erps_contractline extends PO implements I_erps_contractline, I_Pe
 		return ii.intValue();
 	}
 
-	/** Set Committed Amount.
-		@param CommittedAmt 
-		The (legal) commitment amount
+	public org.compiere.model.I_C_Tax getC_Tax() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_Tax)MTable.get(getCtx(), org.compiere.model.I_C_Tax.Table_Name)
+			.getPO(getC_Tax_ID(), get_TrxName());	}
+
+	/** Set Tax.
+		@param C_Tax_ID 
+		Tax identifier
 	  */
-	public void setCommittedAmt (BigDecimal CommittedAmt)
+	public void setC_Tax_ID (int C_Tax_ID)
 	{
-		set_Value (COLUMNNAME_CommittedAmt, CommittedAmt);
+		if (C_Tax_ID < 1) 
+			set_Value (COLUMNNAME_C_Tax_ID, null);
+		else 
+			set_Value (COLUMNNAME_C_Tax_ID, Integer.valueOf(C_Tax_ID));
 	}
 
-	/** Get Committed Amount.
-		@return The (legal) commitment amount
+	/** Get Tax.
+		@return Tax identifier
 	  */
-	public BigDecimal getCommittedAmt () 
+	public int getC_Tax_ID () 
 	{
-		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_CommittedAmt);
-		if (bd == null)
-			 return Env.ZERO;
-		return bd;
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_Tax_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Description.
@@ -522,6 +551,46 @@ public class X_erps_contractline extends PO implements I_erps_contractline, I_Pe
 	public Timestamp getStartDate () 
 	{
 		return (Timestamp)get_Value(COLUMNNAME_StartDate);
+	}
+
+	/** Set Tax Amount.
+		@param TaxAmt 
+		Tax Amount for a document
+	  */
+	public void setTaxAmt (BigDecimal TaxAmt)
+	{
+		set_Value (COLUMNNAME_TaxAmt, TaxAmt);
+	}
+
+	/** Get Tax Amount.
+		@return Tax Amount for a document
+	  */
+	public BigDecimal getTaxAmt () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_TaxAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Tax base Amount.
+		@param TaxBaseAmt 
+		Base for calculating the tax amount
+	  */
+	public void setTaxBaseAmt (BigDecimal TaxBaseAmt)
+	{
+		set_Value (COLUMNNAME_TaxBaseAmt, TaxBaseAmt);
+	}
+
+	/** Get Tax base Amount.
+		@return Base for calculating the tax amount
+	  */
+	public BigDecimal getTaxBaseAmt () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_TaxBaseAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Search Key.

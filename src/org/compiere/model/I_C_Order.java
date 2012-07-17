@@ -90,6 +90,15 @@ public interface I_C_Order
 
 	public org.compiere.model.I_AD_User getAD_User() throws RuntimeException;
 
+    /** Column name amount_of_contract */
+    public static final String COLUMNNAME_amount_of_contract = "amount_of_contract";
+
+	/** Set amount_of_contract	  */
+	public void setamount_of_contract (BigDecimal amount_of_contract);
+
+	/** Get amount_of_contract	  */
+	public BigDecimal getamount_of_contract();
+
     /** Column name AmountRefunded */
     public static final String COLUMNNAME_AmountRefunded = "AmountRefunded";
 
@@ -412,22 +421,22 @@ public interface I_C_Order
 	public int getC_Project_ID();
 
 	public org.compiere.model.I_C_Project getC_Project() throws RuntimeException;
-	
-	
-	   /** Column name C_ProjectPhase_ID */
+
+    /** Column name C_ProjectPhase_ID */
     public static final String COLUMNNAME_C_ProjectPhase_ID = "C_ProjectPhase_ID";
 
-	/** Set Project.
-	  * Financial Project
+	/** Set Project Phase.
+	  * Phase of a Project
 	  */
 	public void setC_ProjectPhase_ID (int C_ProjectPhase_ID);
 
-	/** Get Project.
-	  * Financial Project
+	/** Get Project Phase.
+	  * Phase of a Project
 	  */
 	public int getC_ProjectPhase_ID();
 
 	public org.compiere.model.I_C_ProjectPhase getC_ProjectPhase() throws RuntimeException;
+
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
 
@@ -619,6 +628,73 @@ public interface I_C_Order
 
 	public org.compiere.model.I_AD_User getDropShip_User() throws RuntimeException;
 
+    /** Column name erps_contract_ID */
+    public static final String COLUMNNAME_erps_contract_ID = "erps_contract_ID";
+
+	/** Set erps_contract	  */
+	public void seterps_contract_ID (int erps_contract_ID);
+
+	/** Get erps_contract	  */
+	public int geterps_contract_ID();
+
+	public I_erps_contract geterps_contract() throws RuntimeException;
+
+    /** Column name erps_contractline_ID */
+    public static final String COLUMNNAME_erps_contractline_ID = "erps_contractline_ID";
+
+	/** Set erps_contractline	  */
+	public void seterps_contractline_ID (int erps_contractline_ID);
+
+	/** Get erps_contractline	  */
+	public int geterps_contractline_ID();
+
+	public I_erps_contractline geterps_contractline() throws RuntimeException;
+
+    /** Column name erps_development */
+    public static final String COLUMNNAME_erps_development = "erps_development";
+
+	/** Set erps_development	  */
+	public void seterps_development (boolean erps_development);
+
+	/** Get erps_development	  */
+	public boolean iserps_development();
+
+    /** Column name erps_documentSignDate */
+    public static final String COLUMNNAME_erps_documentSignDate = "erps_documentSignDate";
+
+	/** Set erps_documentSignDate	  */
+	public void seterps_documentSignDate (Timestamp erps_documentSignDate);
+
+	/** Get erps_documentSignDate	  */
+	public Timestamp geterps_documentSignDate();
+
+    /** Column name erps_signedByContractDep */
+    public static final String COLUMNNAME_erps_signedByContractDep = "erps_signedByContractDep";
+
+	/** Set erps_signedByContractDep	  */
+	public void seterps_signedByContractDep (boolean erps_signedByContractDep);
+
+	/** Get erps_signedByContractDep	  */
+	public boolean iserps_signedByContractDep();
+
+    /** Column name erps_signedByDepDirector */
+    public static final String COLUMNNAME_erps_signedByDepDirector = "erps_signedByDepDirector";
+
+	/** Set erps_signedByDepDirector	  */
+	public void seterps_signedByDepDirector (boolean erps_signedByDepDirector);
+
+	/** Get erps_signedByDepDirector	  */
+	public boolean iserps_signedByDepDirector();
+
+    /** Column name erps_signedByEconomist */
+    public static final String COLUMNNAME_erps_signedByEconomist = "erps_signedByEconomist";
+
+	/** Set erps_signedByEconomist	  */
+	public void seterps_signedByEconomist (boolean erps_signedByEconomist);
+
+	/** Get erps_signedByEconomist	  */
+	public boolean iserps_signedByEconomist();
+
     /** Column name FreightAmt */
     public static final String COLUMNNAME_FreightAmt = "FreightAmt";
 
@@ -657,6 +733,17 @@ public interface I_C_Order
 	  * Total amount of document
 	  */
 	public BigDecimal getGrandTotal();
+
+    /** Column name initiator_of_contract */
+    public static final String COLUMNNAME_initiator_of_contract = "initiator_of_contract";
+
+	/** Set initiator_of_contract	  */
+	public void setinitiator_of_contract (int initiator_of_contract);
+
+	/** Get initiator_of_contract	  */
+	public int getinitiator_of_contract();
+
+	public org.compiere.model.I_C_BPartner getinitiator_of_contr() throws RuntimeException;
 
     /** Column name InvoiceRule */
     public static final String COLUMNNAME_InvoiceRule = "InvoiceRule";
@@ -1073,8 +1160,6 @@ public interface I_C_Order
 	  * Sales Representative or Company Agent
 	  */
 	public int getSalesRep_ID();
-
-	public org.compiere.model.I_AD_User getSalesRep() throws RuntimeException;
 
     /** Column name SendEMail */
     public static final String COLUMNNAME_SendEMail = "SendEMail";

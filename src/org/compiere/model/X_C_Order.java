@@ -27,13 +27,13 @@ import org.compiere.util.KeyNamePair;
 /** Generated Model for C_Order
  *  @author Adempiere (generated) 
  *  @version Release 3.7.0LTS - $Id$ */
-public abstract class X_C_Order extends PO implements I_C_Order, I_Persistent 
+public class X_C_Order extends PO implements I_C_Order, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20110831L;
+	private static final long serialVersionUID = 20120717L;
 
     /** Standard Constructor */
     public X_C_Order (Properties ctx, int C_Order_ID, String trxName)
@@ -42,14 +42,12 @@ public abstract class X_C_Order extends PO implements I_C_Order, I_Persistent
       /** if (C_Order_ID == 0)
         {
 			setC_BPartner_ID (0);
-			setC_BPartner_Location_ID (0);
 			setC_Currency_ID (0);
 // @C_Currency_ID@
 			setC_DocType_ID (0);
 // 0
 			setC_DocTypeTarget_ID (0);
 			setC_Order_ID (0);
-			setC_PaymentTerm_ID (0);
 			setDateAcct (new Timestamp( System.currentTimeMillis() ));
 // @#Date@
 			setDateOrdered (new Timestamp( System.currentTimeMillis() ));
@@ -178,6 +176,23 @@ public abstract class X_C_Order extends PO implements I_C_Order, I_Persistent
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set amount_of_contract.
+		@param amount_of_contract amount_of_contract	  */
+	public void setamount_of_contract (BigDecimal amount_of_contract)
+	{
+		set_Value (COLUMNNAME_amount_of_contract, amount_of_contract);
+	}
+
+	/** Get amount_of_contract.
+		@return amount_of_contract	  */
+	public BigDecimal getamount_of_contract () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_amount_of_contract);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set AmountRefunded.
@@ -506,9 +521,9 @@ public abstract class X_C_Order extends PO implements I_C_Order, I_Persistent
 	public void setC_Currency_ID (int C_Currency_ID)
 	{
 		if (C_Currency_ID < 1) 
-			set_ValueNoCheck (COLUMNNAME_C_Currency_ID, null);
+			set_Value (COLUMNNAME_C_Currency_ID, null);
 		else 
-			set_ValueNoCheck (COLUMNNAME_C_Currency_ID, Integer.valueOf(C_Currency_ID));
+			set_Value (COLUMNNAME_C_Currency_ID, Integer.valueOf(C_Currency_ID));
 	}
 
 	/** Get Currency.
@@ -774,29 +789,34 @@ public abstract class X_C_Order extends PO implements I_C_Order, I_Persistent
 			 return 0;
 		return ii.intValue();
 	}
-	
-	/** Set ProjectPhase.
-	@param C_ProjectPhase_ID 
-	Financial ProjectPhase
-  */
-public void setC_ProjectPhase_ID (int C_ProjectPhase_ID)
-{
-	if (C_ProjectPhase_ID < 1) 
-		set_Value (COLUMNNAME_C_ProjectPhase_ID, null);
-	else 
-		set_Value (COLUMNNAME_C_ProjectPhase_ID, Integer.valueOf(C_ProjectPhase_ID));
-}
 
-/** Get ProjectPhase.
-	@return Financial ProjectPhase.
-  */
-public int getC_ProjectPhase_ID () 
-{
-	Integer ii = (Integer)get_Value(COLUMNNAME_C_ProjectPhase_ID);
-	if (ii == null)
-		 return 0;
-	return ii.intValue();
-}
+	public org.compiere.model.I_C_ProjectPhase getC_ProjectPhase() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_ProjectPhase)MTable.get(getCtx(), org.compiere.model.I_C_ProjectPhase.Table_Name)
+			.getPO(getC_ProjectPhase_ID(), get_TrxName());	}
+
+	/** Set Project Phase.
+		@param C_ProjectPhase_ID 
+		Phase of a Project
+	  */
+	public void setC_ProjectPhase_ID (int C_ProjectPhase_ID)
+	{
+		if (C_ProjectPhase_ID < 1) 
+			set_Value (COLUMNNAME_C_ProjectPhase_ID, null);
+		else 
+			set_Value (COLUMNNAME_C_ProjectPhase_ID, Integer.valueOf(C_ProjectPhase_ID));
+	}
+
+	/** Get Project Phase.
+		@return Phase of a Project
+	  */
+	public int getC_ProjectPhase_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_ProjectPhase_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
 
 	/** Set Account Date.
 		@param DateAcct 
@@ -1039,7 +1059,7 @@ public int getC_ProjectPhase_ID ()
 	  */
 	public void setDocumentNo (String DocumentNo)
 	{
-		set_ValueNoCheck (COLUMNNAME_DocumentNo, DocumentNo);
+		set_Value (COLUMNNAME_DocumentNo, DocumentNo);
 	}
 
 	/** Get Document No.
@@ -1142,6 +1162,154 @@ public int getC_ProjectPhase_ID ()
 		return ii.intValue();
 	}
 
+	public I_erps_contract geterps_contract() throws RuntimeException
+    {
+		return (I_erps_contract)MTable.get(getCtx(), I_erps_contract.Table_Name)
+			.getPO(geterps_contract_ID(), get_TrxName());	}
+
+	/** Set erps_contract.
+		@param erps_contract_ID erps_contract	  */
+	public void seterps_contract_ID (int erps_contract_ID)
+	{
+		if (erps_contract_ID < 1) 
+			set_Value (COLUMNNAME_erps_contract_ID, null);
+		else 
+			set_Value (COLUMNNAME_erps_contract_ID, Integer.valueOf(erps_contract_ID));
+	}
+
+	/** Get erps_contract.
+		@return erps_contract	  */
+	public int geterps_contract_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_erps_contract_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_erps_contractline geterps_contractline() throws RuntimeException
+    {
+		return (I_erps_contractline)MTable.get(getCtx(), I_erps_contractline.Table_Name)
+			.getPO(geterps_contractline_ID(), get_TrxName());	}
+
+	/** Set erps_contractline.
+		@param erps_contractline_ID erps_contractline	  */
+	public void seterps_contractline_ID (int erps_contractline_ID)
+	{
+		if (erps_contractline_ID < 1) 
+			set_Value (COLUMNNAME_erps_contractline_ID, null);
+		else 
+			set_Value (COLUMNNAME_erps_contractline_ID, Integer.valueOf(erps_contractline_ID));
+	}
+
+	/** Get erps_contractline.
+		@return erps_contractline	  */
+	public int geterps_contractline_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_erps_contractline_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set erps_development.
+		@param erps_development erps_development	  */
+	public void seterps_development (boolean erps_development)
+	{
+		set_Value (COLUMNNAME_erps_development, Boolean.valueOf(erps_development));
+	}
+
+	/** Get erps_development.
+		@return erps_development	  */
+	public boolean iserps_development () 
+	{
+		Object oo = get_Value(COLUMNNAME_erps_development);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set erps_documentSignDate.
+		@param erps_documentSignDate erps_documentSignDate	  */
+	public void seterps_documentSignDate (Timestamp erps_documentSignDate)
+	{
+		set_Value (COLUMNNAME_erps_documentSignDate, erps_documentSignDate);
+	}
+
+	/** Get erps_documentSignDate.
+		@return erps_documentSignDate	  */
+	public Timestamp geterps_documentSignDate () 
+	{
+		return (Timestamp)get_Value(COLUMNNAME_erps_documentSignDate);
+	}
+
+	/** Set erps_signedByContractDep.
+		@param erps_signedByContractDep erps_signedByContractDep	  */
+	public void seterps_signedByContractDep (boolean erps_signedByContractDep)
+	{
+		set_Value (COLUMNNAME_erps_signedByContractDep, Boolean.valueOf(erps_signedByContractDep));
+	}
+
+	/** Get erps_signedByContractDep.
+		@return erps_signedByContractDep	  */
+	public boolean iserps_signedByContractDep () 
+	{
+		Object oo = get_Value(COLUMNNAME_erps_signedByContractDep);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set erps_signedByDepDirector.
+		@param erps_signedByDepDirector erps_signedByDepDirector	  */
+	public void seterps_signedByDepDirector (boolean erps_signedByDepDirector)
+	{
+		set_Value (COLUMNNAME_erps_signedByDepDirector, Boolean.valueOf(erps_signedByDepDirector));
+	}
+
+	/** Get erps_signedByDepDirector.
+		@return erps_signedByDepDirector	  */
+	public boolean iserps_signedByDepDirector () 
+	{
+		Object oo = get_Value(COLUMNNAME_erps_signedByDepDirector);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/** Set erps_signedByEconomist.
+		@param erps_signedByEconomist erps_signedByEconomist	  */
+	public void seterps_signedByEconomist (boolean erps_signedByEconomist)
+	{
+		set_Value (COLUMNNAME_erps_signedByEconomist, Boolean.valueOf(erps_signedByEconomist));
+	}
+
+	/** Get erps_signedByEconomist.
+		@return erps_signedByEconomist	  */
+	public boolean iserps_signedByEconomist () 
+	{
+		Object oo = get_Value(COLUMNNAME_erps_signedByEconomist);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
 	/** Set Freight Amount.
 		@param FreightAmt 
 		Freight Amount 
@@ -1208,6 +1376,28 @@ public int getC_ProjectPhase_ID ()
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
+	}
+
+	public org.compiere.model.I_C_BPartner getinitiator_of_contr() throws RuntimeException
+    {
+		return (org.compiere.model.I_C_BPartner)MTable.get(getCtx(), org.compiere.model.I_C_BPartner.Table_Name)
+			.getPO(getinitiator_of_contract(), get_TrxName());	}
+
+	/** Set initiator_of_contract.
+		@param initiator_of_contract initiator_of_contract	  */
+	public void setinitiator_of_contract (int initiator_of_contract)
+	{
+		set_Value (COLUMNNAME_initiator_of_contract, Integer.valueOf(initiator_of_contract));
+	}
+
+	/** Get initiator_of_contract.
+		@return initiator_of_contract	  */
+	public int getinitiator_of_contract () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_initiator_of_contract);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** InvoiceRule AD_Reference_ID=150 */
@@ -1937,11 +2127,6 @@ public int getC_ProjectPhase_ID ()
 			 return 0;
 		return ii.intValue();
 	}
-
-	public org.compiere.model.I_AD_User getSalesRep() throws RuntimeException
-    {
-		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_Name)
-			.getPO(getSalesRep_ID(), get_TrxName());	}
 
 	/** Set Sales Representative.
 		@param SalesRep_ID 

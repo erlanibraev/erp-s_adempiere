@@ -62,6 +62,19 @@ public interface I_erps_contractline
 	  */
 	public int getAD_Org_ID();
 
+    /** Column name CommittedAmt */
+    public static final String COLUMNNAME_CommittedAmt = "CommittedAmt";
+
+	/** Set Committed Amount.
+	  * The (legal) commitment amount
+	  */
+	public void setCommittedAmt (BigDecimal CommittedAmt);
+
+	/** Get Committed Amount.
+	  * The (legal) commitment amount
+	  */
+	public BigDecimal getCommittedAmt();
+
     /** Column name C_Order_ID */
     public static final String COLUMNNAME_C_Order_ID = "C_Order_ID";
 
@@ -76,19 +89,6 @@ public interface I_erps_contractline
 	public int getC_Order_ID();
 
 	public org.compiere.model.I_C_Order getC_Order() throws RuntimeException;
-
-    /** Column name CommittedAmt */
-    public static final String COLUMNNAME_CommittedAmt = "CommittedAmt";
-
-	/** Set Committed Amount.
-	  * The (legal) commitment amount
-	  */
-	public void setCommittedAmt (BigDecimal CommittedAmt);
-
-	/** Get Committed Amount.
-	  * The (legal) commitment amount
-	  */
-	public BigDecimal getCommittedAmt();
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
@@ -105,6 +105,21 @@ public interface I_erps_contractline
 	  * User who created this records
 	  */
 	public int getCreatedBy();
+
+    /** Column name C_Tax_ID */
+    public static final String COLUMNNAME_C_Tax_ID = "C_Tax_ID";
+
+	/** Set Tax.
+	  * Tax identifier
+	  */
+	public void setC_Tax_ID (int C_Tax_ID);
+
+	/** Get Tax.
+	  * Tax identifier
+	  */
+	public int getC_Tax_ID();
+
+	public org.compiere.model.I_C_Tax getC_Tax() throws RuntimeException;
 
     /** Column name Description */
     public static final String COLUMNNAME_Description = "Description";
@@ -351,6 +366,32 @@ public interface I_erps_contractline
 	  * First effective day (inclusive)
 	  */
 	public Timestamp getStartDate();
+
+    /** Column name TaxAmt */
+    public static final String COLUMNNAME_TaxAmt = "TaxAmt";
+
+	/** Set Tax Amount.
+	  * Tax Amount for a document
+	  */
+	public void setTaxAmt (BigDecimal TaxAmt);
+
+	/** Get Tax Amount.
+	  * Tax Amount for a document
+	  */
+	public BigDecimal getTaxAmt();
+
+    /** Column name TaxBaseAmt */
+    public static final String COLUMNNAME_TaxBaseAmt = "TaxBaseAmt";
+
+	/** Set Tax base Amount.
+	  * Base for calculating the tax amount
+	  */
+	public void setTaxBaseAmt (BigDecimal TaxBaseAmt);
+
+	/** Get Tax base Amount.
+	  * Base for calculating the tax amount
+	  */
+	public BigDecimal getTaxBaseAmt();
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
