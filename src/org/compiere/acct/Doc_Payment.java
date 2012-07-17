@@ -108,122 +108,190 @@ public class Doc_Payment extends Doc
 	 */
 	public ArrayList<Fact> createFacts (MAcctSchema as)
 	{
-		
-		// V.Sokolov
-		int m_GL_Category_ID = 0; 
-		String sql_ = "SELECT GL_Category_ID FROM C_DocType WHERE C_DocType_ID=?";
-		PreparedStatement pstmt = null;
-		ResultSet rsDT = null;
-		try
-		{
-			pstmt = DB.prepareStatement(sql_, null);
-			pstmt.setInt(1, getC_DocType_ID());
-			rsDT = pstmt.executeQuery();
-			if (rsDT.next())
-			{
-				m_GL_Category_ID = rsDT.getInt(1);
-			}
-		}
-		catch (SQLException e)
-		{
-			log.log(Level.SEVERE, sql_, e);
-		}
-		finally
-		{
-			DB.close(rsDT, pstmt);
-			rsDT = null; 
-			pstmt = null;
-		}
-		
-		// not to create entries V.Sokolov 
-		ArrayList<Fact> facts_ = new ArrayList<Fact>();
-		if(m_GL_Category_ID == 0 || m_GL_Category_ID == 1000001)
-			return facts_;
-		
-		//  create Fact Header
-		Fact fact = new Fact(this, as, Fact.POST_Actual);
-		//	Cash Transfer
-		if ("X".equals(m_TenderType))
-		{
-			ArrayList<Fact> facts = new ArrayList<Fact>();
-			facts.add(fact);
-			return facts;
-		}
-		
-		int AD_Org_ID = getBank_Org_ID();		//	Bank Account Org	
-		if (getDocumentType().equals(DOCTYPE_ARReceipt))
-		{
-			//	Asset
-			FactLine fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
-				getC_Currency_ID(), getAmount(), null);
-			if (fl != null && AD_Org_ID != 0)
-				fl.setAD_Org_ID(AD_Org_ID);
-			//	
-			MAccount acct = null;
-			if (getC_Charge_ID() != 0)
-				acct = MCharge.getAccount(getC_Charge_ID(), as, getAmount());
-			else if (m_Prepayment)
-				acct = getAccount(Doc.ACCTTYPE_C_Prepayment, as);
-			else {
-				acct = getAccount(Doc.ACCTTYPE_UnallocatedCash, as);
-				StringBuffer sql = new StringBuffer (
-						"SELECT b.v_liability_acct FROM c_payment as a"
-						 + " LEFT JOIN erps_stati_bdds as b ON"
-						 + " (a.erps_stati_bdds_id = b.erps_stati_bdds_id)" 
-						 + " WHERE c_payment_id = "+ get_ID()); 
-					int no = DB.getSQLValue(getTrxName(), sql.toString());
-					log.fine(sql + " " + no);
-					System.out.println(sql+ " " + no);
-					if (no>0) acct = MAccount.get (as.getCtx(), no);
-			}	
-			fl = fact.createLine(null, acct,
-				getC_Currency_ID(), null, getAmount());
-			if (fl != null && AD_Org_ID != 0
-				&& getC_Charge_ID() == 0)		//	don't overwrite charge
-				fl.setAD_Org_ID(AD_Org_ID);
-		}
-		//  APP
-		else if (getDocumentType().equals(DOCTYPE_APPayment))
-		{
-			MAccount acct = null;
-			if (getC_Charge_ID() != 0)
-				acct = MCharge.getAccount(getC_Charge_ID(), as, getAmount());
-			else if (m_Prepayment)
-				acct = getAccount(Doc.ACCTTYPE_V_Prepayment, as);
-			else {
-				acct = getAccount(Doc.ACCTTYPE_PaymentSelect, as);
-				StringBuffer sql = new StringBuffer (
-						"SELECT b.v_liability_acct FROM c_payment as a"
-						 + " LEFT JOIN erps_stati_bdds as b ON"
-						 + " (a.erps_stati_bdds_id = b.erps_stati_bdds_id)" 
-						 + " WHERE c_payment_id = "+ get_ID()); 
-					int no = DB.getSQLValue(getTrxName(), sql.toString());
-					log.fine(sql + " " + no);
-					System.out.println(sql+ " " + no);
-					if (no>0) acct = MAccount.get (as.getCtx(), no);
-			}	
-			FactLine fl = fact.createLine(null, acct,
-				getC_Currency_ID(), getAmount(), null);
-			if (fl != null && AD_Org_ID != 0
-				&& getC_Charge_ID() == 0)		//	don't overwrite charge
-				fl.setAD_Org_ID(AD_Org_ID);
-			
-			//	Asset
-			fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
-				getC_Currency_ID(), null, getAmount());
-			if (fl != null && AD_Org_ID != 0)
-				fl.setAD_Org_ID(AD_Org_ID);
-		}
-		else
-		{
-			p_Error = "DocumentType unknown: " + getDocumentType();
-			log.log(Level.SEVERE, p_Error);
-			fact = null;
-		}
-
-		//
-		facts_.add(fact);
-		return facts_;
+	
+				// V.Sokolov
+				int m_GL_Category_ID = 0; 
+				String sql_ = "SELECT GL_Category_ID FROM C_DocType WHERE C_DocType_ID=?";
+				PreparedStatement pstmt = null;
+				ResultSet rsDT = null;
+				try
+				{
+					pstmt = DB.prepareStatement(sql_, null);
+					pstmt.setInt(1, getC_DocType_ID());
+					rsDT = pstmt.executeQuery();
+					if (rsDT.next())
+					{
+						m_GL_Category_ID = rsDT.getInt(1);
+					}
+				}
+				catch (SQLException e)
+				{
+					log.log(Level.SEVERE, sql_, e);
+				}
+				finally
+				{
+					DB.close(rsDT, pstmt);
+					rsDT = null; 
+					pstmt = null;
+				}
+				
+				// not to create entries V.Sokolov 
+				ArrayList<Fact> facts_ = new ArrayList<Fact>();
+				if(m_GL_Category_ID == 0 || m_GL_Category_ID == 1000001)
+					return facts_;
+				
+				//  create Fact Header
+				Fact fact = new Fact(this, as, Fact.POST_Actual);
+				MAccount acct = null;
+				//	Cash Transfer
+				if ("X".equals(m_TenderType))
+				{
+					ArrayList<Fact> facts = new ArrayList<Fact>();
+					facts.add(fact);
+					return facts;
+				}
+				
+				//a.nurpiisov 16072012------------------{
+				boolean fix = false;
+				String zsql = 	" SELECT d.docbasetype, p.c_order_id, p.c_invoice_id, b.isemployee " + 
+					 	" FROM c_payment p " +
+					 	" inner join c_doctype d on d.c_doctype_id = p.c_doctype_id " +
+					 	" inner join c_bpartner b on b.c_bpartner_id = p.c_bpartner_id " +
+					 	" and p.c_payment_id = ? "; 
+						pstmt = null;
+						rsDT = null;
+						try
+						{
+							pstmt = DB.prepareStatement(zsql, null);
+							pstmt.setInt(1, get_ID());
+							rsDT = pstmt.executeQuery();
+							if (rsDT.next()){
+								String isemployee = rsDT.getString(4);
+								String doctype = rsDT.getString(1);
+								if(isemployee.equals("Y")){
+									acct = getAccount(Doc.ACCTTYPE_Employee, as);
+								}else{
+									String typedoc = rsDT.getString(1);
+									if ((!typedoc.equals("") || typedoc != null) && typedoc.equals("APP")){
+										
+										int c_order_id = rsDT.getInt(2);
+										int c_invoice_id = rsDT.getInt(3);
+										
+										if(c_order_id != 0)
+											acct = getAccount(Doc.ACCTTYPE_PaymentSelect2, as);
+										else 
+											acct = getAccount(Doc.ACCTTYPE_V_Liability, as);
+										
+									}else if((!typedoc.equals("") || typedoc != null) && typedoc.equals("ARR")){
+										
+										int c_order_id = rsDT.getInt(2);
+										int c_invoice_id = rsDT.getInt(3);
+										
+										if(c_order_id != 0)
+											acct = getAccount(Doc.ACCTTYPE_CustomerContract, as);
+										else if(c_invoice_id != 0)
+											acct = getAccount(Doc.ACCTTYPE_CustomerInvoice, as);
+										else fix = true;
+										
+									}else fix = true;
+								}
+							}else fix = true;
+							
+						}
+							catch (SQLException e)
+						{
+							log.log(Level.SEVERE, zsql, e);
+						}
+						finally
+						{
+							DB.close(rsDT, pstmt);
+							rsDT = null; 
+							pstmt = null;
+						}
+						
+						if(!fix){
+							FactLine fl = fact.createLine(null, acct,
+									getC_Currency_ID(), getAmount(), null);
+							fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
+									getC_Currency_ID(), null, getAmount());
+						}
+				//}--------------------------------------
+				
+				if(fix){
+					int AD_Org_ID = getBank_Org_ID();		//	Bank Account Org	
+					if (getDocumentType().equals(DOCTYPE_ARReceipt))
+					{
+						//	Asset
+						FactLine fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
+							getC_Currency_ID(), getAmount(), null);
+						if (fl != null && AD_Org_ID != 0)
+							fl.setAD_Org_ID(AD_Org_ID);
+						//	
+						acct = null;
+						if (getC_Charge_ID() != 0)
+							acct = MCharge.getAccount(getC_Charge_ID(), as, getAmount());
+						else if (m_Prepayment)
+							acct = getAccount(Doc.ACCTTYPE_C_Prepayment, as);
+						else {
+							acct = getAccount(Doc.ACCTTYPE_UnallocatedCash, as);
+							StringBuffer sql = new StringBuffer (
+									"SELECT b.v_liability_acct FROM c_payment as a"
+									 + " LEFT JOIN erps_stati_bdds as b ON"
+									 + " (a.erps_stati_bdds_id = b.erps_stati_bdds_id)" 
+									 + " WHERE c_payment_id = "+ get_ID()); 
+								int no = DB.getSQLValue(getTrxName(), sql.toString());
+								log.fine(sql + " " + no);
+								System.out.println(sql+ " " + no);
+								if (no>0) acct = MAccount.get (as.getCtx(), no);
+						}	
+						fl = fact.createLine(null, acct,
+							getC_Currency_ID(), null, getAmount());
+						if (fl != null && AD_Org_ID != 0
+							&& getC_Charge_ID() == 0)		//	don't overwrite charge
+							fl.setAD_Org_ID(AD_Org_ID);
+					}
+					//  APP
+					else if (getDocumentType().equals(DOCTYPE_APPayment))
+					{
+						acct = null;
+						if (getC_Charge_ID() != 0)
+							acct = MCharge.getAccount(getC_Charge_ID(), as, getAmount());
+						else if (m_Prepayment)
+							acct = getAccount(Doc.ACCTTYPE_V_Prepayment, as);
+						else {
+							acct = getAccount(Doc.ACCTTYPE_PaymentSelect, as);
+							StringBuffer sql = new StringBuffer (
+									"SELECT b.v_liability_acct FROM c_payment as a"
+									 + " LEFT JOIN erps_stati_bdds as b ON"
+									 + " (a.erps_stati_bdds_id = b.erps_stati_bdds_id)" 
+									 + " WHERE c_payment_id = "+ get_ID()); 
+								int no = DB.getSQLValue(getTrxName(), sql.toString());
+								log.fine(sql + " " + no);
+								System.out.println(sql+ " " + no);
+								if (no>0) acct = MAccount.get (as.getCtx(), no);
+						}	
+						FactLine fl = fact.createLine(null, acct,
+							getC_Currency_ID(), getAmount(), null);
+						if (fl != null && AD_Org_ID != 0
+							&& getC_Charge_ID() == 0)		//	don't overwrite charge
+							fl.setAD_Org_ID(AD_Org_ID);
+						
+						//	Asset
+						fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
+							getC_Currency_ID(), null, getAmount());
+						if (fl != null && AD_Org_ID != 0)
+							fl.setAD_Org_ID(AD_Org_ID);
+					}
+					else
+					{
+						p_Error = "DocumentType unknown: " + getDocumentType();
+						log.log(Level.SEVERE, p_Error);
+						fact = null;
+					}
+				}
+				//
+				facts_.add(fact);
+				return facts_;
 	}   //  createFact
 
 	/**
