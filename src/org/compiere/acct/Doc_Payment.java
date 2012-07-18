@@ -218,9 +218,9 @@ public class Doc_Payment extends Doc
 										getC_Currency_ID(), null, getAmount());
 							}else{
 								FactLine fl = fact.createLine(null, getAccount(Doc.ACCTTYPE_BankInTransit, as),
-										getC_Currency_ID(), null, getAmount());
+										getC_Currency_ID(), getAmount(), null );
 								fl = fact.createLine(null, acct,
-										getC_Currency_ID(), getAmount(), null);
+										getC_Currency_ID(), null, getAmount());
 
 							}
 						}
