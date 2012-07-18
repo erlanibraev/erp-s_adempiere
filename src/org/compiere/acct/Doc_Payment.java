@@ -173,26 +173,27 @@ public class Doc_Payment extends Doc
 									acct = getAccount(Doc.ACCTTYPE_Employee, as);
 								}else{
 									String typedoc = rsDT.getString(1);
+									int c_order_id = rsDT.getInt(2);
+									int c_invoice_id = rsDT.getInt(3);
+									
 									if ((!typedoc.equals("") || typedoc != null) && typedoc.equals("APP")){
-										
-										int c_order_id = rsDT.getInt(2);
-										int c_invoice_id = rsDT.getInt(3);
 										
 										if(c_order_id != 0)
 											acct = getAccount(Doc.ACCTTYPE_PaymentSelect2, as);
-										else 
+										else if(c_invoice_id != 0)
 											acct = getAccount(Doc.ACCTTYPE_V_Liability, as);
+										else 
+											acct = getAccount(Doc.ACCTTYPE_Employee, as);
 										
 									}else if((!typedoc.equals("") || typedoc != null) && typedoc.equals("ARR")){
-										
-										int c_order_id = rsDT.getInt(2);
-										int c_invoice_id = rsDT.getInt(3);
 										
 										if(c_order_id != 0)
 											acct = getAccount(Doc.ACCTTYPE_CustomerContract, as);
 										else if(c_invoice_id != 0)
 											acct = getAccount(Doc.ACCTTYPE_CustomerInvoice, as);
-										else fix = true;
+										else 
+											acct = getAccount(Doc.ACCTTYPE_Employee, as);
+
 										
 									}else fix = true;
 								}
