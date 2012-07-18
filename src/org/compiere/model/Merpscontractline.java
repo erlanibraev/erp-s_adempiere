@@ -1,17 +1,12 @@
 package org.compiere.model;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.logging.Level;
 
 import org.compiere.util.DB;
 import org.compiere.util.Env;
-
-import extend.org.compiere.CalloutContractTax;
 
 public class Merpscontractline extends X_erps_contractline {
 	
@@ -60,9 +55,6 @@ public class Merpscontractline extends X_erps_contractline {
 			//
 			if (!documentLevel)		// calculate line tax
 				taxAmt = taxAmt.add(m_tax.calculateTax(baseAmt, true, 2));
-			
-			if (taxBaseAmt == null)
-				return false;
 			
 			//	Calculate Tax
 			if (documentLevel)		//	document level
