@@ -50,14 +50,14 @@
 
   <target name="compile" depends="init" description="compilando codigo fuente ">
   	<!-- Compile the java code (ZK) from ${srcZk} to ${buildWeb)-->
-    <javac srcdir="${src}" destdir="${buildJava}" includeantruntime="false" encoding="UTF-8">
+    <javac srcdir="${src}" destdir="${buildJava}" includeantruntime="false" encoding="UTF-8" debug="true">
       <classpath refid="lib.class.path"/>
     </javac>
     
   	<!-- Compile the java code (base) from ${src} to ${build_java}  -->
-  	    <javac srcdir="${srcZk}" destdir="${buildWeb}" includeantruntime="false" encoding="UTF-8">
-  	      <classpath refid="lib.class.path"/>
-  	    </javac>
+  	<javac srcdir="${srcZk}" destdir="${buildWeb}" includeantruntime="false" encoding="UTF-8" debug="true">
+      <classpath refid="lib.class.path"/>
+    </javac>
   </target>
 
   <target name="dist" depends="compile" description="genera el jar final" >
