@@ -188,7 +188,7 @@ public class GenerateTable extends SvrProcess {
 	       number = new Number(2, j+dep, m_lines[n].geterps_tableNumber(), borderStyle); 
 	       sheet.addCell(number);
 	       // Initials
-		   label = new Label(3, j+dep, m_lines[n].getLastName()+" "+m_lines[n].getFirstName()+" "+m_lines[n].getMiddleName(), borderStyle); 
+		   label = new Label(3, j+dep, m_lines[n].getName(), borderStyle); 
 	       sheet.addCell(label);
 	       // Job
 		   label = new Label(4, j+dep, job.getName(), borderStyle); 
@@ -259,6 +259,14 @@ public class GenerateTable extends SvrProcess {
        copy.write();
        copy.close();
        tableBook.close();
+       
+       try{    
+   		   String fileName = fullPath.toString();
+   		   String command = "excel \""+fileName+"\"";
+   		   Runtime.getRuntime().exec("cmd /c start "+command);
+   	   }catch(Exception e){
+   		   e.printStackTrace();
+   	   }
 		
        return Msg.translate(m_ctx, "Success");
 	}

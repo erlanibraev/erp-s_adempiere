@@ -49,7 +49,7 @@ public class PartnerSchedule extends Named {
 		ResultSet rs = null;
 		
 		// Employee data from the card
-				String sql_ = "SELECT * FROM HRM_SCHEDULESETTINGS_V WHERE AD_CLIENT_ID=? " +
+				String sql_ = "SELECT * FROM ERPS_SCHEDULESETTINGS_V WHERE AD_CLIENT_ID=? " +
 						"AND C_BPARTNER_ID=? " +
 						"AND DATEFROM = ?";
 		try

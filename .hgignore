@@ -4,10 +4,13 @@ buildJava
 ?
 ?.bat
 *.log
+*.xls
+*.xlsx
+
 temp
 temp.*
 Thumbs.db
-test.properties
+*.properties
 
 .settings/org.eclipse.core.resources.prefs
 buildCustomization.properties

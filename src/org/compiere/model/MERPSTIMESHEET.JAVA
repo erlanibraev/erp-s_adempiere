@@ -45,7 +45,7 @@ public class Merpstimesheet extends X_erps_timesheet {
 		Merpstimesheet timeSheet = new Merpstimesheet(Env.getCtx(), 0, null);
 			
 		// Employee data from the timesheets
-		String sql_ = "SELECT * FROM HRM_TIMESHEET " +
+		String sql_ = "SELECT * FROM ERPS_TIMESHEET " +
 						"WHERE ISACTIVE='Y' " +
 						"AND AD_CLIENT_ID=? " +
 						"AND C_BPARTNER_ID=? " +
