@@ -9,7 +9,6 @@ import java.util.Properties;
 import java.util.TimeZone;
 import java.util.logging.Level;
 
-import jxl.Sheet;
 import jxl.Workbook;
 import jxl.write.*;
 import jxl.format.Alignment;
@@ -22,7 +21,7 @@ import jxl.write.Number;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAttachmentEntry;
 import org.compiere.model.MBPartner;
-import org.compiere.model.Mhrmtimesheet;
+import org.compiere.model.Merpstimesheet;
 import org.compiere.model.X_C_BPartner;
 import org.eevolution.model.X_HR_Employee;
 import org.compiere.util.Env;
@@ -229,11 +228,11 @@ public class GenerateTable extends SvrProcess {
 	    	       day += p.getDay();
 	    	       
 	    	       // insert or update Timesheet for the payroll 
-	    	       Mhrmtimesheet timeSheet = Mhrmtimesheet.getTimeSheet(m_lines[n].getC_BPartner_ID(), new Timestamp(calendar.getTime().getTime()));
+	    	       Merpstimesheet timeSheet = Merpstimesheet.getTimeSheet(m_lines[n].getC_BPartner_ID(), new Timestamp(calendar.getTime().getTime()));
 	    	       timeSheet.setC_BPartner_ID(m_lines[n].getC_BPartner_ID());
 	    	       timeSheet.setDateFrom(new Timestamp(calendar.getTime().getTime()));
-	    	       timeSheet.sethrm_hourquota(p.getHour());
-	    	       timeSheet.sethrm_shedulerule_ID(p.getRuleId());
+	    	       timeSheet.seterps_hourQuota(p.getHour());
+	    	       timeSheet.seterps_scheduleRule_ID(p.getRuleId());
 	    	       timeSheet.saveEx();
 
 	    	       p = null;
